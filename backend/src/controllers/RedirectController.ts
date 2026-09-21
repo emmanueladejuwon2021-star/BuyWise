@@ -1,8 +1,11 @@
 import { Request, Response } from 'express';
 import { Product } from '../models/Product';
 import { ClickLog } from '../models/ClickLog';
+import { CampaignService } from '../services/CampaignService';
 import winston from 'winston';
 import { config } from '../config';
+
+const campaignService = new CampaignService();
 
 const logger = winston.createLogger({
   level: config.logLevel,
@@ -99,7 +102,36 @@ export class RedirectController {
       const duration = Date.now() - startTime;
       logger.info(`[Redirect] ${productId} → ${retailerId} (${duration}ms)`);
 
-      // 6. Issue 302 redirect
+      // 6. Check for active sponsored campaigns and handle sponsored click
+      try {
+        const activeCampaigns = await campaignService.getActiveCampaigns(
+          'comparison_top',
+          productId,
+          undefined
+        );
+
+        const sponsoredCampaign = activeCampaigns.find(c => c.storeId === retailerId);
+
+        if (sponsoredCampaign) {
+          // Record sponsored click and deduct credits
+          await campaignService.recordSponsoredClick(sponsoredCampaign._id.toString(), {
+            storeId: retailerId,
+            productId,
+            userId: req.user?.id,
+            sessionId: req.headers['x-session-id'] as string,
+            userIp: req.ip || req.socket.remoteAddress,
+            userAgent: req.headers['user-agent'],
+            referrerUrl: req.headers.referer || req.headers.referrer as string,
+          });
+
+          logger.info(`[Redirect] Sponsored click recorded for campaign ${sponsoredCampaign._id}`);
+        }
+      } catch (campaignError: any) {
+        // Don't fail redirect if campaign tracking fails
+        logger.warn('[Redirect] Failed to process sponsored click:', campaignError.message);
+      }
+
+      // 7. Issue 302 redirect
       res.redirect(302, redirectUrl);
 
     } catch (error: any) {

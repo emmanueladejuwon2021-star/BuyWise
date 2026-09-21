@@ -11,6 +11,10 @@ import { PriceHistory } from './models/PriceHistory';
 import { watchlistController } from './controllers/WatchlistController';
 import { priceHistoryController } from './controllers/PriceHistoryController';
 import { redirectController } from './controllers/RedirectController';
+import { storeController } from './controllers/StoreController';
+import { campaignController } from './controllers/CampaignController';
+import { analyticsController } from './controllers/AnalyticsController';
+import { paymentWebhookController } from './controllers/PaymentWebhookController';
 import { alertEvaluationEngine } from './services/AlertEvaluationEngine';
 import winston from 'winston';
 
@@ -248,6 +252,34 @@ app.get('/api/v1/products/:masterProductId/price-summary', priceHistoryControlle
 app.get('/api/v1/redirect/:productId/:retailerId', redirectController.redirect.bind(redirectController));
 app.get('/api/v1/clicks/stats', redirectController.getClickStats.bind(redirectController));
 app.get('/api/v1/clicks/user/:userId', redirectController.getUserClicks.bind(redirectController));
+
+// Store Management Routes
+app.post('/api/v1/store/register', storeController.registerStore.bind(storeController));
+app.get('/api/v1/store/profile', storeController.getStoreProfile.bind(storeController));
+app.put('/api/v1/store/profile', storeController.updateStoreProfile.bind(storeController));
+app.post('/api/v1/store/membership/checkout', storeController.initializeMembershipCheckout.bind(storeController));
+app.post('/api/v1/store/credits/checkout', storeController.initializeCreditsCheckout.bind(storeController));
+app.get('/api/v1/store/membership/plans', storeController.getMembershipPlans.bind(storeController));
+app.get('/api/v1/store/payments', storeController.getPaymentHistory.bind(storeController));
+
+// Campaign Management Routes
+app.post('/api/v1/store/campaigns', campaignController.createCampaign.bind(campaignController));
+app.get('/api/v1/store/campaigns', campaignController.getStoreCampaigns.bind(campaignController));
+app.get('/api/v1/store/campaigns/stats', campaignController.getCampaignStats.bind(campaignController));
+app.get('/api/v1/store/campaigns/:campaignId', campaignController.getCampaignDetails.bind(campaignController));
+app.put('/api/v1/store/campaigns/:campaignId/pause', campaignController.pauseCampaign.bind(campaignController));
+app.put('/api/v1/store/campaigns/:campaignId/resume', campaignController.resumeCampaign.bind(campaignController));
+
+// Analytics Routes
+app.get('/api/v1/store/analytics/demand', analyticsController.getDemandReport.bind(analyticsController));
+app.get('/api/v1/store/analytics/insights', analyticsController.getShopperInsights.bind(analyticsController));
+app.get('/api/v1/store/analytics/performance', analyticsController.getStorePerformance.bind(analyticsController));
+app.get('/api/v1/store/analytics/competitive', analyticsController.getCompetitiveAnalysis.bind(analyticsController));
+app.get('/api/v1/admin/analytics/platform', analyticsController.getPlatformAnalytics.bind(analyticsController));
+
+// Payment Webhook Routes
+app.post('/api/v1/webhooks/payments/paystack', express.raw({ type: 'application/json' }), paymentWebhookController.handlePaystackWebhook.bind(paymentWebhookController));
+app.post('/api/v1/webhooks/payments/flutterwave', express.raw({ type: 'application/json' }), paymentWebhookController.handleFlutterwaveWebhook.bind(paymentWebhookController));
 
 // Public API - Get recent price changes
 app.get('/api/v1/admin/ingestion/price-changes', async (req, res) => {

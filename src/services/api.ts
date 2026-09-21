@@ -363,6 +363,40 @@ class ApiService {
 
     return response.json();
   }
+
+  /**
+   * Register a new store
+   */
+  async registerStore(data: {
+    businessName: string;
+    logoUrl?: string;
+    description?: string;
+    address?: string;
+    city?: string;
+    state?: string;
+    deliveryAreas?: string[];
+    contactEmail: string;
+    contactPhone?: string;
+    website?: string;
+  }): Promise<{
+    success: boolean;
+    data: any;
+    message: string;
+  }> {
+    const response = await fetch(`${API_BASE_URL}/store/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to register store');
+    }
+
+    return response.json();
+  }
 }
 
 export const api = new ApiService();
