@@ -1,0 +1,80 @@
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import { ToastProvider } from './context/ToastContext';
+import Header from './components/Header';
+import Footer from './components/Footer';
+import HomePage from './pages/HomePage';
+import SearchPage from './pages/SearchPage';
+import ProductDetailPage from './pages/ProductDetailPage';
+import DealsPage from './pages/DealsPage';
+import LoginPage from './pages/LoginPage';
+import SignupPage from './pages/SignupPage';
+import WatchlistPage from './pages/WatchlistPage';
+import CategoriesPage from './pages/CategoriesPage';
+import DashboardPage from './pages/DashboardPage';
+import AdminDashboard from './pages/AdminDashboard';
+import StoreRegistrationPage from './pages/StoreRegistrationPage';
+import StoreDashboardPage from './pages/StoreDashboardPage';
+import CampaignManagerPage from './pages/CampaignManagerPage';
+import StoreAnalyticsPage from './pages/StoreAnalyticsPage';
+import StorePaymentPage from './pages/StorePaymentPage';
+import StoreSettingsPage from './pages/StoreSettingsPage';
+import HelpPage from './pages/HelpPage';
+import LegalPage from './pages/LegalPage';
+
+const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const location = useLocation();
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
+
+  if (isAuthPage) {
+    return <>{children}</>;
+  }
+
+  return (
+    <div className="flex flex-col min-h-screen bg-gray-50">
+      <Header />
+      <main className="flex-1">{children}</main>
+      <Footer />
+    </div>
+  );
+};
+
+const App: React.FC = () => {
+  return (
+    <ToastProvider>
+      <AuthProvider>
+        <Router>
+          <Layout>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/search" element={<SearchPage />} />
+              <Route path="/product/:id" element={<ProductDetailPage />} />
+              <Route path="/deals" element={<DealsPage />} />
+              <Route path="/watchlist" element={<WatchlistPage />} />
+              <Route path="/categories" element={<CategoriesPage />} />
+              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/store/register" element={<StoreRegistrationPage />} />
+              <Route path="/store/dashboard" element={<StoreDashboardPage />} />
+              <Route path="/store/campaigns" element={<CampaignManagerPage />} />
+              <Route path="/store/analytics" element={<StoreAnalyticsPage />} />
+              <Route path="/store/payment" element={<StorePaymentPage />} />
+              <Route path="/store/settings" element={<StoreSettingsPage />} />
+              <Route path="/help" element={<HelpPage />} />
+              <Route path="/privacy" element={<LegalPage type="privacy" />} />
+              <Route path="/terms" element={<LegalPage type="terms" />} />
+              <Route path="/cookies" element={<LegalPage type="cookies" />} />
+              <Route path="/affiliate" element={<LegalPage type="affiliate" />} />
+              <Route path="/about" element={<LegalPage type="about" />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/signup" element={<SignupPage />} />
+            </Routes>
+          </Layout>
+        </Router>
+      </AuthProvider>
+    </ToastProvider>
+  );
+};
+
+export default App;
