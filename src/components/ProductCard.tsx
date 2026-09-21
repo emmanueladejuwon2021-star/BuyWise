@@ -40,7 +40,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, view = 'grid' }) => 
       <Link to={`/product/${product.id}`} className="block bg-white rounded-2xl border border-gray-100 hover:shadow-lg hover:border-indigo-200 transition-all duration-300 overflow-hidden">
         <div className="flex flex-col sm:flex-row">
           <div className="relative sm:w-56 h-48 sm:h-auto shrink-0">
-            <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+            <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
             {bestListing.discount > 10 && (
               <span className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
                 -{bestListing.discount}%
@@ -70,8 +70,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, view = 'grid' }) => 
                 </div>
               </div>
               <div className="text-right shrink-0">
-                <p className="text-xs text-gray-500 mb-1">Best price at {bestListing.store.name}</p>
-                <p className="text-xl font-bold text-gray-900">{formatPrice(bestListing.price, bestListing.currency)}</p>
+                <p className="text-xs text-gray-500 mb-1">Best total at {bestListing.store.name}</p>
+                <p className="text-xl font-bold text-gray-900">{formatPrice(bestListing.totalCost, bestListing.currency)}</p>
                 {bestListing.originalPrice > bestListing.price && (
                   <p className="text-sm text-gray-400 line-through">{formatPrice(bestListing.originalPrice, bestListing.currency)}</p>
                 )}
@@ -81,6 +81,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, view = 'grid' }) => 
                     Save up to {formatPrice(savings, bestListing.currency)}
                   </p>
                 )}
+                <p className="text-[10px] text-gray-400 mt-1">incl. shipping • {bestListing.deliveryDays}</p>
               </div>
             </div>
             <div className="flex items-center gap-2 mt-3 pt-3 border-t">
@@ -104,7 +105,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, view = 'grid' }) => 
     <Link to={`/product/${product.id}`} className="group bg-white rounded-2xl border border-gray-100 hover:shadow-xl hover:border-indigo-200 hover:-translate-y-1 transition-all duration-300 overflow-hidden">
       <div className="relative aspect-square overflow-hidden bg-gray-50">
         <img
-          src={product.image}
+          src={product.images[0]}
           alt={product.name}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
@@ -149,10 +150,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, view = 'grid' }) => 
         </div>
         <div className="flex items-end justify-between">
           <div>
-            <p className="text-lg font-bold text-gray-900">{formatPrice(bestListing.price, bestListing.currency)}</p>
+            <p className="text-lg font-bold text-gray-900">{formatPrice(bestListing.totalCost, bestListing.currency)}</p>
             {bestListing.originalPrice > bestListing.price && (
               <p className="text-xs text-gray-400 line-through">{formatPrice(bestListing.originalPrice, bestListing.currency)}</p>
             )}
+            <p className="text-[10px] text-gray-400">incl. shipping</p>
           </div>
           <div className="text-right">
             <p className="text-xs text-gray-500 flex items-center gap-1">

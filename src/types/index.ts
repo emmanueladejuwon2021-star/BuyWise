@@ -1,14 +1,28 @@
 export interface Product {
   id: string;
   name: string;
+  slug: string;
   description: string;
   category: string;
-  image: string;
+  subcategory: string;
+  images: string[];
   brand: string;
   ratings: Rating[];
   listings: StoreListing[];
   specifications: Record<string, string>;
   tags: string[];
+  priceHistory: PriceHistoryEntry[];
+  masterProductId?: string;
+  variants?: ProductVariant[];
+  lastVerified: string;
+  totalClicks: number;
+}
+
+export interface ProductVariant {
+  id: string;
+  name: string;
+  attributes: Record<string, string>;
+  priceModifier: number;
 }
 
 export interface StoreListing {
@@ -17,16 +31,25 @@ export interface StoreListing {
   originalPrice: number;
   currency: string;
   shippingCost: number;
+  shippingMethod: string;
+  totalCost: number;
   deliveryDays: string;
+  deliveryDate: string;
   inStock: boolean;
+  stockLevel: 'in-stock' | 'low-stock' | 'pre-order' | 'out-of-stock';
   rating: number;
   reviews: number;
   affiliateUrl: string;
+  affiliateTag: string;
   discount: number;
   lastUpdated: string;
+  lastVerified: string;
   seller: string;
+  sellerId: string;
   condition: 'new' | 'refurbished' | 'used';
   warranty: string;
+  returnPolicy: string;
+  freshnessHours: number;
 }
 
 export interface Store {
@@ -35,8 +58,12 @@ export interface Store {
   logo: string;
   color: string;
   commissionRate: number;
+  affiliateBaseUrl: string;
   rating: number;
   country: string;
+  website: string;
+  verified: boolean;
+  responseTime: string;
 }
 
 export interface Rating {
@@ -45,6 +72,14 @@ export interface Rating {
   comment: string;
   date: string;
   verified: boolean;
+  helpful: number;
+}
+
+export interface PriceHistoryEntry {
+  date: string;
+  storeId: string;
+  price: number;
+  currency: string;
 }
 
 export interface Category {
@@ -52,6 +87,7 @@ export interface Category {
   name: string;
   icon: string;
   count: number;
+  subcategories: string[];
 }
 
 export interface Deal {
@@ -70,12 +106,64 @@ export interface User {
   avatar: string;
   watchlist: string[];
   priceAlerts: PriceAlert[];
+  clickHistory: ClickLog[];
+  preferences: UserPreferences;
+  notificationSettings: NotificationSettings;
+  createdAt: string;
 }
 
 export interface PriceAlert {
   id: string;
   productId: string;
+  productName: string;
   targetPrice: number;
+  alertType: 'below-price' | 'percentage-drop' | 'any-drop';
+  percentageThreshold?: number;
   active: boolean;
   createdAt: string;
+  lastTriggered?: string;
+  channels: ('email' | 'sms' | 'push')[];
+}
+
+export interface ClickLog {
+  id: string;
+  productId: string;
+  productName: string;
+  storeId: string;
+  storeName: string;
+  timestamp: string;
+  source: string;
+  price: number;
+  currency: string;
+}
+
+export interface UserPreferences {
+  defaultCity: string;
+  defaultState: string;
+  currency: string;
+  maxDeliveryDays: number;
+  preferredStores: string[];
+}
+
+export interface NotificationSettings {
+  emailEnabled: boolean;
+  emailFrequency: 'instant' | 'daily' | 'weekly';
+  smsEnabled: boolean;
+  pushEnabled: boolean;
+  priceDropAlerts: boolean;
+  dealAlerts: boolean;
+  backInStockAlerts: boolean;
+}
+
+export interface OutboundRedirect {
+  clickId: string;
+  productId: string;
+  storeId: string;
+  userId?: string;
+  affiliateTag: string;
+  subId: string;
+  timestamp: string;
+  source: string;
+  originalUrl: string;
+  redirectUrl: string;
 }

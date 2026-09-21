@@ -11,6 +11,7 @@ import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import WatchlistPage from './pages/WatchlistPage';
 import CategoriesPage from './pages/CategoriesPage';
+import DashboardPage from './pages/DashboardPage';
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
@@ -50,6 +51,7 @@ const AppRoutes: React.FC = () => {
         <Route path="/deals" element={<DealsPage />} />
         <Route path="/watchlist" element={<WatchlistPage />} />
         <Route path="/categories" element={<CategoriesPage />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
       </Routes>
     </Layout>
   );

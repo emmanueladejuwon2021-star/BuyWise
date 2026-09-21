@@ -14,6 +14,8 @@ const SearchPage: React.FC = () => {
   const [selectedStores, setSelectedStores] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
   const [ratingFilter, setRatingFilter] = useState(0);
+  const [inStockOnly, setInStockOnly] = useState(false);
+  const [maxDeliveryDays, setMaxDeliveryDays] = useState(30);
 
   const filteredProducts = useMemo(() => {
     let results = [...products];
@@ -45,24 +47,36 @@ const SearchPage: React.FC = () => {
     // Rating filter
     if (ratingFilter > 0) {
       results = results.filter(p => {
-        const avg = p.ratings.reduce((sum, r) => sum + r.rating, 0) / p.ratings.length;
-        return avg >= ratingFilter;
+        const maxRating = Math.max(...p.listings.map(l => l.rating));
+        return maxRating >= ratingFilter;
       });
+    }
+
+    // In-stock filter
+    if (inStockOnly) {
+      results = results.filter(p => p.listings.some(l => l.inStock));
+    }
+
+    // Max delivery days filter
+    if (maxDeliveryDays < 30) {
+      results = results.filter(p => 
+        p.listings.some(l => parseInt(l.deliveryDays) <= maxDeliveryDays)
+      );
     }
 
     // Sort
     switch (sortBy) {
       case 'price-low':
         results.sort((a, b) => {
-          const aPrice = Math.min(...a.listings.map(l => l.currency === '₦' ? l.price : l.price * 1500));
-          const bPrice = Math.min(...b.listings.map(l => l.currency === '₦' ? l.price : l.price * 1500));
+          const aPrice = Math.min(...a.listings.map(l => l.currency === '₦' ? l.totalCost : l.totalCost * 1500));
+          const bPrice = Math.min(...b.listings.map(l => l.currency === '₦' ? l.totalCost : l.totalCost * 1500));
           return aPrice - bPrice;
         });
         break;
       case 'price-high':
         results.sort((a, b) => {
-          const aPrice = Math.max(...a.listings.map(l => l.currency === '₦' ? l.price : l.price * 1500));
-          const bPrice = Math.max(...b.listings.map(l => l.currency === '₦' ? l.price : l.price * 1500));
+          const aPrice = Math.max(...a.listings.map(l => l.currency === '₦' ? l.totalCost : l.totalCost * 1500));
+          const bPrice = Math.max(...b.listings.map(l => l.currency === '₦' ? l.totalCost : l.totalCost * 1500));
           return bPrice - aPrice;
         });
         break;
@@ -75,9 +89,27 @@ const SearchPage: React.FC = () => {
         break;
       case 'rating':
         results.sort((a, b) => {
-          const aRating = a.ratings.reduce((sum, r) => sum + r.rating, 0) / a.ratings.length;
-          const bRating = b.ratings.reduce((sum, r) => sum + r.rating, 0) / b.ratings.length;
+          const aRating = Math.max(...a.listings.map(l => l.rating));
+          const bRating = Math.max(...b.listings.map(l => l.rating));
           return bRating - aRating;
+        });
+        break;
+      case 'delivery':
+        results.sort((a, b) => {
+          const aDelivery = Math.min(...a.listings.map(l => parseInt(l.deliveryDays)));
+          const bDelivery = Math.min(...b.listings.map(l => parseInt(l.deliveryDays)));
+          return aDelivery - bDelivery;
+        });
+        break;
+      case 'best-value':
+        results.sort((a, b) => {
+          const aBest = Math.min(...a.listings.map(l => l.currency === '₦' ? l.totalCost : l.totalCost * 1500));
+          const bBest = Math.min(...b.listings.map(l => l.currency === '₦' ? l.totalCost : l.totalCost * 1500));
+          const aRating = Math.max(...a.listings.map(l => l.rating));
+          const bRating = Math.max(...b.listings.map(l => l.rating));
+          const aScore = (1000000 / aBest) * 0.5 + aRating * 0.5;
+          const bScore = (1000000 / bBest) * 0.5 + bRating * 0.5;
+          return bScore - aScore;
         });
         break;
       case 'stores':
@@ -86,7 +118,7 @@ const SearchPage: React.FC = () => {
     }
 
     return results;
-  }, [query, categoryFilter, sortBy, selectedStores, ratingFilter, priceRange]);
+  }, [query, categoryFilter, sortBy, selectedStores, ratingFilter, priceRange, inStockOnly, maxDeliveryDays]);
 
   const toggleStore = (storeId: string) => {
     setSelectedStores(prev =>
@@ -164,10 +196,12 @@ const SearchPage: React.FC = () => {
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:border-indigo-500"
                 >
                   <option value="relevance">Relevance</option>
-                  <option value="price-low">Price: Low to High</option>
-                  <option value="price-high">Price: High to Low</option>
+                  <option value="price-low">Lowest Total Cost (incl. shipping)</option>
+                  <option value="price-high">Highest Price</option>
                   <option value="discount">Biggest Discount</option>
-                  <option value="rating">Highest Rated</option>
+                  <option value="rating">Highest Seller Rating</option>
+                  <option value="delivery">Fastest Delivery</option>
+                  <option value="best-value">Best Overall Value</option>
                   <option value="stores">Most Stores</option>
                 </select>
               </div>
@@ -233,7 +267,40 @@ const SearchPage: React.FC = () => {
               </div>
 
               {/* Active Filters */}
-              {(selectedStores.length > 0 || ratingFilter > 0) && (
+              {/* In-Stock Only */}
+              <div>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={inStockOnly}
+                    onChange={(e) => setInStockOnly(e.target.checked)}
+                    className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                  />
+                  <span className="text-sm font-medium text-gray-900">In Stock Only</span>
+                </label>
+              </div>
+
+              {/* Max Delivery Time */}
+              <div>
+                <h4 className="font-semibold text-sm text-gray-900 mb-3">Max Delivery Time</h4>
+                <div className="flex flex-wrap gap-1">
+                  {[3, 5, 7, 14, 30].map(days => (
+                    <button
+                      key={days}
+                      onClick={() => setMaxDeliveryDays(days)}
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                        maxDeliveryDays === days
+                          ? 'bg-indigo-600 text-white'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      }`}
+                    >
+                      {days === 30 ? 'Any' : `${days} days`}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {(selectedStores.length > 0 || ratingFilter > 0 || inStockOnly || maxDeliveryDays < 30) && (
                 <div>
                   <h4 className="font-semibold text-sm text-gray-900 mb-3">Active Filters</h4>
                   <div className="flex flex-wrap gap-2">
@@ -259,7 +326,7 @@ const SearchPage: React.FC = () => {
                     )}
                   </div>
                   <button
-                    onClick={() => { setSelectedStores([]); setRatingFilter(0); }}
+                    onClick={() => { setSelectedStores([]); setRatingFilter(0); setInStockOnly(false); setMaxDeliveryDays(30); }}
                     className="mt-3 text-xs text-red-500 hover:underline"
                   >
                     Clear all filters
@@ -277,7 +344,7 @@ const SearchPage: React.FC = () => {
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">No products found</h3>
                 <p className="text-gray-500 mb-6">Try adjusting your search or filters</p>
                 <button
-                  onClick={() => { setSelectedStores([]); setRatingFilter(0); }}
+                  onClick={() => { setSelectedStores([]); setRatingFilter(0); setInStockOnly(false); setMaxDeliveryDays(30); }}
                   className="px-6 py-2 bg-indigo-600 text-white rounded-full text-sm font-medium hover:bg-indigo-700 transition-colors"
                 >
                   Clear Filters

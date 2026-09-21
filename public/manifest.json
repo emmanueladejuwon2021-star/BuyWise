@@ -1,0 +1,25 @@
+{
+  "name": "PriceWise - Smart Price Comparison",
+  "short_name": "PriceWise",
+  "description": "Compare prices across Jumia, Konga, Amazon, and more. Save money on every purchase.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4f46e5",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["shopping", "finance"],
+  "lang": "en",
+  "dir": "ltr"
+}

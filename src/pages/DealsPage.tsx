@@ -109,7 +109,7 @@ const DealsPage: React.FC = () => {
                 className="block bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-lg hover:border-green-200 transition-all"
               >
                 <div className="flex flex-col sm:flex-row gap-5">
-                  <img src={product.image} alt={product.name} className="w-full sm:w-32 h-32 object-cover rounded-xl" />
+                  <img src={product.images[0]} alt={product.name} className="w-full sm:w-32 h-32 object-cover rounded-xl" />
                   <div className="flex-1">
                     <div className="flex items-start justify-between gap-4">
                       <div>

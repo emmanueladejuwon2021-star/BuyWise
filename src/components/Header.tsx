@@ -135,10 +135,10 @@ const Header: React.FC = () => {
                         <p className="font-medium text-sm">{user?.name}</p>
                         <p className="text-xs text-gray-500">{user?.email}</p>
                       </div>
-                      <Link to="/profile" className="block px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors">My Profile</Link>
+                      <Link to="/dashboard" className="block px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors">Dashboard</Link>
                       <Link to="/watchlist" className="block px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors">Watchlist</Link>
-                      <Link to="/alerts" className="block px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors">Price Alerts</Link>
-                      <Link to="/orders" className="block px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors">My Orders</Link>
+                      <Link to="/dashboard" className="block px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors">Price Alerts</Link>
+                      <Link to="/dashboard" className="block px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors">Click History</Link>
                       <button
                         onClick={logout}
                         className="w-full text-left px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors border-t"
@@ -179,6 +179,7 @@ const Header: React.FC = () => {
             <Link to="/categories" onClick={() => setShowMobileMenu(false)} className="block py-2 text-sm font-medium hover:text-indigo-600">Categories</Link>
             <Link to="/deals" onClick={() => setShowMobileMenu(false)} className="block py-2 text-sm font-medium hover:text-indigo-600">Hot Deals 🔥</Link>
             <Link to="/watchlist" onClick={() => setShowMobileMenu(false)} className="block py-2 text-sm font-medium hover:text-indigo-600">Watchlist</Link>
+            {isAuthenticated && <Link to="/dashboard" onClick={() => setShowMobileMenu(false)} className="block py-2 text-sm font-medium hover:text-indigo-600">Dashboard</Link>}
             {isAuthenticated ? (
               <button onClick={() => { logout(); setShowMobileMenu(false); }} className="block py-2 text-sm font-medium text-red-500">Sign Out</button>
             ) : (
