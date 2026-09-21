@@ -397,6 +397,230 @@ class ApiService {
 
     return response.json();
   }
+
+  /**
+   * Get store profile
+   */
+  async getStoreProfile(): Promise<{
+    success: boolean;
+    data: any;
+  }> {
+    const response = await fetch(`${API_BASE_URL}/store/profile`);
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch store profile');
+    }
+
+    return response.json();
+  }
+
+  /**
+   * Update store profile
+   */
+  async updateStoreProfile(data: any): Promise<{
+    success: boolean;
+    data: any;
+    message: string;
+  }> {
+    const response = await fetch(`${API_BASE_URL}/store/profile`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to update store profile');
+    }
+
+    return response.json();
+  }
+
+  /**
+   * Get campaign statistics
+   */
+  async getCampaignStats(): Promise<{
+    success: boolean;
+    data: any;
+  }> {
+    const response = await fetch(`${API_BASE_URL}/store/campaigns/stats`);
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch campaign stats');
+    }
+
+    return response.json();
+  }
+
+  /**
+   * Get store campaigns
+   */
+  async getStoreCampaigns(status?: string): Promise<{
+    success: boolean;
+    data: any[];
+  }> {
+    const url = status 
+      ? `${API_BASE_URL}/store/campaigns?status=${status}`
+      : `${API_BASE_URL}/store/campaigns`;
+    
+    const response = await fetch(url);
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch campaigns');
+    }
+
+    return response.json();
+  }
+
+  /**
+   * Create a new campaign
+   */
+  async createCampaign(data: {
+    campaignName: string;
+    productId?: string;
+    targetCategory?: string;
+    totalBudget: number;
+    costPerClick: number;
+    placementLocation: 'search_top' | 'comparison_top' | 'homepage_banner';
+    startDate: string;
+    endDate?: string;
+  }): Promise<{
+    success: boolean;
+    data: any;
+    message: string;
+  }> {
+    const response = await fetch(`${API_BASE_URL}/store/campaigns`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to create campaign');
+    }
+
+    return response.json();
+  }
+
+  /**
+   * Get membership plans
+   */
+  async getMembershipPlans(): Promise<{
+    success: boolean;
+    data: any;
+  }> {
+    const response = await fetch(`${API_BASE_URL}/store/membership/plans`);
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch membership plans');
+    }
+
+    return response.json();
+  }
+
+  /**
+   * Initialize membership checkout
+   */
+  async initializeMembershipCheckout(membershipLevel: 'premium' | 'enterprise', paymentProvider: string = 'paystack'): Promise<{
+    success: boolean;
+    data: any;
+    message: string;
+  }> {
+    const response = await fetch(`${API_BASE_URL}/store/membership/checkout`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ membershipLevel, paymentProvider }),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to initialize checkout');
+    }
+
+    return response.json();
+  }
+
+  /**
+   * Initialize credits checkout
+   */
+  async initializeCreditsCheckout(creditsAmount: number, paymentProvider: string = 'paystack'): Promise<{
+    success: boolean;
+    data: any;
+    message: string;
+  }> {
+    const response = await fetch(`${API_BASE_URL}/store/credits/checkout`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ creditsAmount, paymentProvider }),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to initialize checkout');
+    }
+
+    return response.json();
+  }
+
+  /**
+   * Get store analytics
+   */
+  async getStoreAnalytics(type: 'demand' | 'insights' | 'performance' | 'competitive', params?: any): Promise<{
+    success: boolean;
+    data: any;
+  }> {
+    const queryParams = new URLSearchParams(params).toString();
+    const response = await fetch(`${API_BASE_URL}/store/analytics/${type}?${queryParams}`);
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch analytics');
+    }
+
+    return response.json();
+  }
+
+  /**
+   * Pause a campaign
+   */
+  async pauseCampaign(campaignId: string): Promise<{
+    success: boolean;
+    data: any;
+    message: string;
+  }> {
+    const response = await fetch(`${API_BASE_URL}/store/campaigns/${campaignId}/pause`, {
+      method: 'PUT',
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to pause campaign');
+    }
+
+    return response.json();
+  }
+
+  /**
+   * Resume a campaign
+   */
+  async resumeCampaign(campaignId: string): Promise<{
+    success: boolean;
+    data: any;
+    message: string;
+  }> {
+    const response = await fetch(`${API_BASE_URL}/store/campaigns/${campaignId}/resume`, {
+      method: 'PUT',
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to resume campaign');
+    }
+
+    return response.json();
+  }
 }
 
 export const api = new ApiService();

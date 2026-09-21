@@ -14,6 +14,12 @@ import WatchlistPage from './pages/WatchlistPage';
 import CategoriesPage from './pages/CategoriesPage';
 import DashboardPage from './pages/DashboardPage';
 import AdminDashboard from './pages/AdminDashboard';
+import StoreRegistrationPage from './pages/StoreRegistrationPage';
+import StoreDashboardPage from './pages/StoreDashboardPage';
+import CampaignManagerPage from './pages/CampaignManagerPage';
+import StoreAnalyticsPage from './pages/StoreAnalyticsPage';
+import StorePaymentPage from './pages/StorePaymentPage';
+import StoreSettingsPage from './pages/StoreSettingsPage';
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
@@ -45,10 +51,17 @@ const App: React.FC = () => {
               <Route path="/deals" element={<DealsPage />} />
               <Route path="/watchlist" element={<WatchlistPage />} />
               <Route path="/categories" element={<CategoriesPage />} />
-<Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/signup" element={<SignupPage />} />            </Routes>
+              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/store/register" element={<StoreRegistrationPage />} />
+              <Route path="/store/dashboard" element={<StoreDashboardPage />} />
+              <Route path="/store/campaigns" element={<CampaignManagerPage />} />
+              <Route path="/store/analytics" element={<StoreAnalyticsPage />} />
+              <Route path="/store/payment" element={<StorePaymentPage />} />
+              <Route path="/store/settings" element={<StoreSettingsPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/signup" element={<SignupPage />} />
+            </Routes>
           </Layout>
         </Router>
       </AuthProvider>
