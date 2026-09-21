@@ -10,6 +10,7 @@ import { Product } from './models/Product';
 import { PriceHistory } from './models/PriceHistory';
 import { watchlistController } from './controllers/WatchlistController';
 import { priceHistoryController } from './controllers/PriceHistoryController';
+import { redirectController } from './controllers/RedirectController';
 import { alertEvaluationEngine } from './services/AlertEvaluationEngine';
 import winston from 'winston';
 
@@ -242,6 +243,11 @@ app.get('/api/v1/watchlist/stats', watchlistController.getWatchlistStats.bind(wa
 // Price History Analytics API Routes
 app.get('/api/v1/products/:masterProductId/price-history', priceHistoryController.getPriceHistory.bind(priceHistoryController));
 app.get('/api/v1/products/:masterProductId/price-summary', priceHistoryController.getPriceSummary.bind(priceHistoryController));
+
+// Affiliate Redirect & Click Tracking Routes
+app.get('/api/v1/redirect/:productId/:retailerId', redirectController.redirect.bind(redirectController));
+app.get('/api/v1/clicks/stats', redirectController.getClickStats.bind(redirectController));
+app.get('/api/v1/clicks/user/:userId', redirectController.getUserClicks.bind(redirectController));
 
 // Public API - Get recent price changes
 app.get('/api/v1/admin/ingestion/price-changes', async (req, res) => {
