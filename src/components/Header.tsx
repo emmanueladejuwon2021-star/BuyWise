@@ -39,6 +39,10 @@ const Header: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 flex justify-between items-center">
           <span>🔥 Compare prices across 8+ stores and save up to 30%!</span>
           <div className="hidden md:flex items-center gap-4">
+            <Link to="/store/register" className="hover:text-yellow-300 font-semibold transition-colors">
+              🏪 Are you a store owner? Sell on PriceWise →
+            </Link>
+            <span className="text-white/50">|</span>
             <span>📞 +234 800 PRICE</span>
             <span>📧 help@pricewise.ng</span>
           </div>
@@ -106,17 +110,18 @@ const Header: React.FC = () => {
             )}
           </form>
 
+          {/* Sell on PriceWise Button - ALWAYS VISIBLE */}
+          <Link
+            to="/store/register"
+            className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-orange-500 to-red-500 text-white text-sm font-bold rounded-full hover:scale-105 transition-all shadow-lg whitespace-nowrap"
+          >
+            <span className="text-lg">🏪</span>
+            <span className="hidden sm:inline">Sell on PriceWise</span>
+            <span className="sm:hidden">Sell</span>
+          </Link>
+
           {/* Navigation Icons */}
           <div className="hidden md:flex items-center gap-1">
-            {/* Sell on PriceWise Button */}
-            <Link
-              to="/store/register"
-              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-medium rounded-full hover:opacity-90 transition-opacity mr-2"
-            >
-              <span>🏪</span>
-              <span>Sell on PriceWise</span>
-            </Link>
-
             {isAuthenticated ? (
               <>
                 <Link to="/watchlist" className="p-2.5 hover:bg-gray-100 rounded-full relative transition-colors">
@@ -194,12 +199,22 @@ const Header: React.FC = () => {
       {showMobileMenu && (
         <div className="md:hidden border-t bg-white">
           <div className="px-4 py-4 space-y-3">
-            <Link to="/" onClick={() => setShowMobileMenu(false)} className="block py-2 text-sm font-medium hover:text-indigo-600">Home</Link>
-            <Link to="/categories" onClick={() => setShowMobileMenu(false)} className="block py-2 text-sm font-medium hover:text-indigo-600">Categories</Link>
-            <Link to="/deals" onClick={() => setShowMobileMenu(false)} className="block py-2 text-sm font-medium hover:text-indigo-600">Hot Deals 🔥</Link>
-            <Link to="/watchlist" onClick={() => setShowMobileMenu(false)} className="block py-2 text-sm font-medium hover:text-indigo-600">Watchlist</Link>
-            <Link to="/store/register" onClick={() => setShowMobileMenu(false)} className="block py-2 text-sm font-medium text-indigo-600 bg-indigo-50 rounded-lg px-3 py-2">🏪 Sell on PriceWise</Link>
-            {isAuthenticated && <Link to="/dashboard" onClick={() => setShowMobileMenu(false)} className="block py-2 text-sm font-medium hover:text-indigo-600">Dashboard</Link>}
+            {/* PROMINENT MERCHANT LINK */}
+            <Link 
+              to="/store/register" 
+              onClick={() => setShowMobileMenu(false)} 
+              className="block py-3 px-4 text-base font-bold text-white bg-gradient-to-r from-orange-500 to-red-500 rounded-xl text-center shadow-lg"
+            >
+              🏪 Sell on PriceWise
+            </Link>
+            
+            <div className="border-t border-gray-200 pt-3">
+              <Link to="/" onClick={() => setShowMobileMenu(false)} className="block py-2 text-sm font-medium hover:text-indigo-600">Home</Link>
+              <Link to="/categories" onClick={() => setShowMobileMenu(false)} className="block py-2 text-sm font-medium hover:text-indigo-600">Categories</Link>
+              <Link to="/deals" onClick={() => setShowMobileMenu(false)} className="block py-2 text-sm font-medium hover:text-indigo-600">Hot Deals 🔥</Link>
+              <Link to="/watchlist" onClick={() => setShowMobileMenu(false)} className="block py-2 text-sm font-medium hover:text-indigo-600">Watchlist</Link>
+              {isAuthenticated && <Link to="/dashboard" onClick={() => setShowMobileMenu(false)} className="block py-2 text-sm font-medium hover:text-indigo-600">Dashboard</Link>}
+            </div>
             {isAuthenticated ? (
               <button onClick={() => { logout(); setShowMobileMenu(false); addToast('Signed out successfully', 'success'); navigate('/'); }} className="block py-2 text-sm font-medium text-red-500">Sign Out</button>
             ) : (
