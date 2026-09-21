@@ -22,7 +22,10 @@ const PriceHistorySchema = new Schema({
   percentageChange: { type: Number },
 });
 
-// Compound index for efficient queries
+// Compound indexes for efficient time-series queries
 PriceHistorySchema.index({ productId: 1, retailerId: 1, timestamp: -1 });
+PriceHistorySchema.index({ productId: 1, timestamp: -1 });
+PriceHistorySchema.index({ timestamp: -1 });
+PriceHistorySchema.index({ isOutlier: 1, timestamp: -1 });
 
 export const PriceHistory = mongoose.model<IPriceHistory>('PriceHistory', PriceHistorySchema);

@@ -224,6 +224,145 @@ class ApiService {
 
     return response.json();
   }
+
+  /**
+   * Get user's watchlist
+   */
+  async getWatchlist(page: number = 1, limit: number = 20): Promise<{
+    success: boolean;
+    data: any[];
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      pages: number;
+    };
+  }> {
+    const response = await fetch(`${API_BASE_URL}/watchlist?page=${page}&limit=${limit}`);
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch watchlist');
+    }
+
+    return response.json();
+  }
+
+  /**
+   * Add product to watchlist
+   */
+  async addToWatchlist(data: {
+    masterProductId: string;
+    productName: string;
+    productImage?: string;
+    targetPrice?: number;
+    targetPercentageDrop?: number;
+    alertType?: 'absolute' | 'percentage' | 'any';
+    channels?: ('email' | 'sms' | 'push')[];
+  }): Promise<{
+    success: boolean;
+    data: any;
+    message: string;
+  }> {
+    const response = await fetch(`${API_BASE_URL}/watchlist`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to add to watchlist');
+    }
+
+    return response.json();
+  }
+
+  /**
+   * Update watchlist item
+   */
+  async updateWatchlistItem(watchlistId: string, data: {
+    targetPrice?: number;
+    targetPercentageDrop?: number;
+    alertType?: 'absolute' | 'percentage' | 'any';
+    channels?: ('email' | 'sms' | 'push')[];
+    isActive?: boolean;
+  }): Promise<{
+    success: boolean;
+    data: any;
+    message: string;
+  }> {
+    const response = await fetch(`${API_BASE_URL}/watchlist/${watchlistId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to update watchlist item');
+    }
+
+    return response.json();
+  }
+
+  /**
+   * Remove product from watchlist
+   */
+  async removeFromWatchlist(watchlistId: string): Promise<{
+    success: boolean;
+    message: string;
+  }> {
+    const response = await fetch(`${API_BASE_URL}/watchlist/${watchlistId}`, {
+      method: 'DELETE',
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to remove from watchlist');
+    }
+
+    return response.json();
+  }
+
+  /**
+   * Get watchlist statistics
+   */
+  async getWatchlistStats(): Promise<{
+    success: boolean;
+    data: {
+      totalItems: number;
+      activeItems: number;
+      totalSavings: number;
+      averageSavingsPercentage: number;
+      itemsAtAllTimeLow: number;
+      itemsWithAlerts: number;
+    };
+  }> {
+    const response = await fetch(`${API_BASE_URL}/watchlist/stats`);
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch watchlist stats');
+    }
+
+    return response.json();
+  }
+
+  /**
+   * Get price analytics for a product
+   */
+  async getPriceAnalytics(productId: string, range: '30d' | '90d' | '180d' | 'all' = '90d'): Promise<{
+    success: boolean;
+    data: any;
+  }> {
+    const response = await fetch(`${API_BASE_URL}/products/${productId}/price-history?range=${range}`);
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch price analytics');
+    }
+
+    return response.json();
+  }
 }
 
 export const api = new ApiService();

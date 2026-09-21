@@ -4,6 +4,7 @@ import { config } from '../config';
 import { JumiaScraper } from '../scrapers/JumiaScraper';
 import { Product } from '../models/Product';
 import { PriceHistory } from '../models/PriceHistory';
+import { alertEvaluationEngine } from '../services/AlertEvaluationEngine';
 import winston from 'winston';
 
 const logger = winston.createLogger({
@@ -156,6 +157,17 @@ async function updateProduct(scrapedData: any, retailerId: string): Promise<void
           percentageChange,
           isOutlier: Math.abs(percentageChange) > 50,
         });
+
+        // Trigger alert evaluation if price dropped
+        if (newPrice < oldPrice) {
+          await alertEvaluationEngine.queuePriceUpdate(
+            product._id.toString(),
+            retailerId,
+            oldPrice,
+            newPrice
+          );
+          logger.info(`[Worker] Queued alert evaluation for price drop: ₦${oldPrice} → ₦${newPrice}`);
+        }
 
         // Update listing
         product.listings[listingIndex] = listingData as any;

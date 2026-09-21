@@ -8,6 +8,9 @@ import { initializeQueues, scrapeQueue } from './config/redis';
 import { JumiaScraper } from './scrapers/JumiaScraper';
 import { Product } from './models/Product';
 import { PriceHistory } from './models/PriceHistory';
+import { watchlistController } from './controllers/WatchlistController';
+import { priceHistoryController } from './controllers/PriceHistoryController';
+import { alertEvaluationEngine } from './services/AlertEvaluationEngine';
 import winston from 'winston';
 
 const logger = winston.createLogger({
@@ -228,6 +231,17 @@ app.get('/api/v1/products/:id/price-history', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+// Watchlist API Routes
+app.get('/api/v1/watchlist', watchlistController.getWatchlist.bind(watchlistController));
+app.post('/api/v1/watchlist', watchlistController.addToWatchlist.bind(watchlistController));
+app.put('/api/v1/watchlist/:watchlistId', watchlistController.updateWatchlistItem.bind(watchlistController));
+app.delete('/api/v1/watchlist/:watchlistId', watchlistController.removeFromWatchlist.bind(watchlistController));
+app.get('/api/v1/watchlist/stats', watchlistController.getWatchlistStats.bind(watchlistController));
+
+// Price History Analytics API Routes
+app.get('/api/v1/products/:masterProductId/price-history', priceHistoryController.getPriceHistory.bind(priceHistoryController));
+app.get('/api/v1/products/:masterProductId/price-summary', priceHistoryController.getPriceSummary.bind(priceHistoryController));
 
 // Public API - Get recent price changes
 app.get('/api/v1/admin/ingestion/price-changes', async (req, res) => {
