@@ -104,7 +104,7 @@ const SignupPage: React.FC = () => {
             <div className="flex items-start gap-2">
               <input type="checkbox" className="w-4 h-4 mt-0.5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" required />
               <span className="text-xs text-gray-500">
-                I agree to the <a href="#" className="text-indigo-600 hover:underline">Terms of Service</a> and <a href="#" className="text-indigo-600 hover:underline">Privacy Policy</a>
+                I agree to the <Link to="/terms" className="text-indigo-600 hover:underline">Terms of Service</Link> and <Link to="/privacy" className="text-indigo-600 hover:underline">Privacy Policy</Link>
               </span>
             </div>
 

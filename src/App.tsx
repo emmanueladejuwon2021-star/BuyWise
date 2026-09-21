@@ -20,6 +20,8 @@ import CampaignManagerPage from './pages/CampaignManagerPage';
 import StoreAnalyticsPage from './pages/StoreAnalyticsPage';
 import StorePaymentPage from './pages/StorePaymentPage';
 import StoreSettingsPage from './pages/StoreSettingsPage';
+import HelpPage from './pages/HelpPage';
+import LegalPage from './pages/LegalPage';
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
@@ -59,6 +61,12 @@ const App: React.FC = () => {
               <Route path="/store/analytics" element={<StoreAnalyticsPage />} />
               <Route path="/store/payment" element={<StorePaymentPage />} />
               <Route path="/store/settings" element={<StoreSettingsPage />} />
+              <Route path="/help" element={<HelpPage />} />
+              <Route path="/privacy" element={<LegalPage type="privacy" />} />
+              <Route path="/terms" element={<LegalPage type="terms" />} />
+              <Route path="/cookies" element={<LegalPage type="cookies" />} />
+              <Route path="/affiliate" element={<LegalPage type="affiliate" />} />
+              <Route path="/about" element={<LegalPage type="about" />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignupPage />} />
             </Routes>

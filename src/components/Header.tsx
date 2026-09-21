@@ -132,8 +132,8 @@ const Header: React.FC = () => {
                     </span>
                   )}
                 </Link>
-                <button 
-                  onClick={() => addToast('No new notifications', 'info')}
+                <Link 
+                  to="/dashboard"
                   className="p-2.5 hover:bg-gray-100 rounded-full transition-colors relative"
                   title="Notifications"
                 >
@@ -141,7 +141,7 @@ const Header: React.FC = () => {
                   {user && user.priceAlerts.length > 0 && (
                     <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
                   )}
-                </button>
+                </Link>
                 <div className="relative">
                   <button
                     onClick={() => setShowUserMenu(!showUserMenu)}

@@ -112,14 +112,16 @@ const LoginPage: React.FC = () => {
             </div>
             <div className="grid grid-cols-2 gap-3 mt-4">
               <button
-                onClick={() => addToast('Google OAuth coming soon! Use email login for now.', 'info')}
+                onClick={() => addToast('Google login is being set up. Please use email login for now.', 'info', 4000)}
                 className="flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                title="Coming soon - Use email login"
               >
                 <span>🔵</span> Google
               </button>
               <button
-                onClick={() => addToast('Facebook login coming soon! Use email login for now.', 'info')}
+                onClick={() => addToast('Facebook login is being set up. Please use email login for now.', 'info', 4000)}
                 className="flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                title="Coming soon - Use email login"
               >
                 <span>📘</span> Facebook
               </button>

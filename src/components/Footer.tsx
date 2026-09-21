@@ -101,11 +101,11 @@ const Footer: React.FC = () => {
           <div>
             <h4 className="text-white font-semibold mb-4">Support</h4>
             <ul className="space-y-2.5">
-              <li><button onClick={() => addToast('Help center coming soon!', 'info')} className="text-sm hover:text-indigo-400 transition-colors text-left">Help Center</button></li>
-              <li><button onClick={() => addToast('Email us at help@pricewise.ng', 'info')} className="text-sm hover:text-indigo-400 transition-colors text-left">Contact Us</button></li>
-              <li><button onClick={() => addToast('FAQs coming soon!', 'info')} className="text-sm hover:text-indigo-400 transition-colors text-left">FAQs</button></li>
-              <li><button onClick={() => addToast('Thanks for your feedback!', 'success')} className="text-sm hover:text-indigo-400 transition-colors text-left">Send Feedback</button></li>
-              <li><button onClick={() => addToast('Bug report form coming soon!', 'info')} className="text-sm hover:text-indigo-400 transition-colors text-left">Report a Bug</button></li>
+              <li><Link to="/help" className="text-sm hover:text-indigo-400 transition-colors">Help Center</Link></li>
+              <li><a href="mailto:help@pricewise.ng" className="text-sm hover:text-indigo-400 transition-colors">Contact Us</a></li>
+              <li><Link to="/help" className="text-sm hover:text-indigo-400 transition-colors">FAQs</Link></li>
+              <li><a href="mailto:feedback@pricewise.ng" className="text-sm hover:text-indigo-400 transition-colors">Send Feedback</a></li>
+              <li><a href="mailto:bugs@pricewise.ng" className="text-sm hover:text-indigo-400 transition-colors">Report a Bug</a></li>
             </ul>
           </div>
 
@@ -113,11 +113,11 @@ const Footer: React.FC = () => {
           <div>
             <h4 className="text-white font-semibold mb-4">Legal</h4>
             <ul className="space-y-2.5">
-              <li><button onClick={() => addToast('Privacy Policy page coming soon!', 'info')} className="text-sm hover:text-indigo-400 transition-colors text-left">Privacy Policy</button></li>
-              <li><button onClick={() => addToast('Terms of Service page coming soon!', 'info')} className="text-sm hover:text-indigo-400 transition-colors text-left">Terms of Service</button></li>
-              <li><button onClick={() => addToast('Cookie Policy page coming soon!', 'info')} className="text-sm hover:text-indigo-400 transition-colors text-left">Cookie Policy</button></li>
-              <li><button onClick={() => addToast('Affiliate Disclosure: We earn commissions on purchases made through our links at no extra cost to you.', 'info', 6000)} className="text-sm hover:text-indigo-400 transition-colors text-left">Affiliate Disclosure</button></li>
-              <li><button onClick={() => addToast('About page coming soon!', 'info')} className="text-sm hover:text-indigo-400 transition-colors text-left">About Us</button></li>
+              <li><Link to="/privacy" className="text-sm hover:text-indigo-400 transition-colors">Privacy Policy</Link></li>
+              <li><Link to="/terms" className="text-sm hover:text-indigo-400 transition-colors">Terms of Service</Link></li>
+              <li><Link to="/cookies" className="text-sm hover:text-indigo-400 transition-colors">Cookie Policy</Link></li>
+              <li><Link to="/affiliate" className="text-sm hover:text-indigo-400 transition-colors">Affiliate Disclosure</Link></li>
+              <li><Link to="/about" className="text-sm hover:text-indigo-400 transition-colors">About Us</Link></li>
             </ul>
           </div>
         </div>
