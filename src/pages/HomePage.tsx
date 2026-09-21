@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, TrendingUp, Zap, Shield, Clock, BarChart3, Sparkles, ChevronRight } from 'lucide-react';
+import { ArrowRight, TrendingUp, Zap, Shield, Clock, BarChart3, Sparkles, ChevronRight, Eye } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import { useToast } from '../context/ToastContext';
 import { products, categories, trendingSearches, stores, getBestDeal } from '../data/products';
@@ -226,6 +226,77 @@ const HomePage: React.FC = () => {
           {filteredProducts.map(product => (
             <ProductCard key={product.id} product={product} />
           ))}
+        </div>
+      </section>
+
+      {/* Merchant CTA Section */}
+      <section className="max-w-7xl mx-auto px-4 py-12">
+        <div className="bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-600 rounded-3xl p-8 md:p-12 relative overflow-hidden">
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute bottom-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
+            <div className="absolute top-0 right-0 w-64 h-64 bg-yellow-300 rounded-full blur-3xl"></div>
+          </div>
+          <div className="relative grid md:grid-cols-2 gap-8 items-center">
+            <div>
+              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 mb-4">
+                <span className="text-2xl">🏪</span>
+                <span className="text-sm text-white/90 font-medium">For Store Owners</span>
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                Grow Your Business with PriceWise
+              </h2>
+              <p className="text-white/80 mb-6 text-lg">
+                Reach thousands of shoppers actively looking for products like yours. Get verified, promote your listings, and track performance with our analytics dashboard.
+              </p>
+              <ul className="space-y-3 mb-8">
+                {[
+                  'Get verified store badge',
+                  'Sponsored listing placements',
+                  'Real-time analytics & insights',
+                  'Market demand reports',
+                  'Competitive analysis',
+                ].map((feature, i) => (
+                  <li key={i} className="flex items-center gap-2 text-white/90">
+                    <span className="text-green-300">✓</span>
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              <Link
+                to="/store/register"
+                className="inline-flex items-center gap-2 bg-white text-indigo-600 font-semibold px-8 py-4 rounded-full hover:bg-gray-100 transition-colors shadow-xl"
+              >
+                Register Your Store <ArrowRight size={18} />
+              </Link>
+            </div>
+            <div className="hidden md:block">
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-4 bg-white/10 rounded-xl">
+                    <div>
+                      <p className="text-white/60 text-xs">Monthly Revenue</p>
+                      <p className="text-white text-2xl font-bold">₦2.5M+</p>
+                    </div>
+                    <TrendingUp size={32} className="text-green-300" />
+                  </div>
+                  <div className="flex items-center justify-between p-4 bg-white/10 rounded-xl">
+                    <div>
+                      <p className="text-white/60 text-xs">Active Customers</p>
+                      <p className="text-white text-2xl font-bold">15,000+</p>
+                    </div>
+                    <Eye size={32} className="text-blue-300" />
+                  </div>
+                  <div className="flex items-center justify-between p-4 bg-white/10 rounded-xl">
+                    <div>
+                      <p className="text-white/60 text-xs">Conversion Rate</p>
+                      <p className="text-white text-2xl font-bold">12.5%</p>
+                    </div>
+                    <BarChart3 size={32} className="text-purple-300" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

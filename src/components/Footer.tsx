@@ -80,6 +80,7 @@ const Footer: React.FC = () => {
               <li><Link to="/deals" className="text-sm hover:text-indigo-400 transition-colors">Hot Deals</Link></li>
               <li><Link to="/search" className="text-sm hover:text-indigo-400 transition-colors">All Products</Link></li>
               <li><Link to="/dashboard" className="text-sm hover:text-indigo-400 transition-colors">My Dashboard</Link></li>
+              <li><Link to="/store/register" className="text-sm hover:text-indigo-400 transition-colors font-semibold">🏪 Sell on PriceWise</Link></li>
             </ul>
           </div>
 
