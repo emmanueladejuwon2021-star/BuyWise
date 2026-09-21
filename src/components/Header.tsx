@@ -145,6 +145,7 @@ const Header: React.FC = () => {
                         <p className="text-xs text-gray-500">{user?.email}</p>
                       </div>
                       <Link to="/dashboard" className="block px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors">Dashboard</Link>
+                      <Link to="/admin" className="block px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors">Admin Panel</Link>
                       <Link to="/watchlist" className="block px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors">Watchlist</Link>
                       <Link to="/dashboard" className="block px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors">Price Alerts</Link>
                       <Link to="/dashboard" className="block px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors">Click History</Link>

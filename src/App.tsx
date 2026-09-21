@@ -13,6 +13,7 @@ import SignupPage from './pages/SignupPage';
 import WatchlistPage from './pages/WatchlistPage';
 import CategoriesPage from './pages/CategoriesPage';
 import DashboardPage from './pages/DashboardPage';
+import AdminDashboard from './pages/AdminDashboard';
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
@@ -44,10 +45,10 @@ const App: React.FC = () => {
               <Route path="/deals" element={<DealsPage />} />
               <Route path="/watchlist" element={<WatchlistPage />} />
               <Route path="/categories" element={<CategoriesPage />} />
-              <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/signup" element={<SignupPage />} />
-            </Routes>
+<Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} />            </Routes>
           </Layout>
         </Router>
       </AuthProvider>
