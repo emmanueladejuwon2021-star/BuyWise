@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, Menu, X, User, Heart, Bell, ShoppingCart, ChevronDown } from 'lucide-react';
+import { Search, Menu, X, Heart, Bell, ChevronDown } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import { trendingSearches } from '../data/products';
 
 const Header: React.FC = () => {
@@ -10,6 +11,7 @@ const Header: React.FC = () => {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showSearchSuggestions, setShowSearchSuggestions] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
+  const { addToast } = useToast();
   const navigate = useNavigate();
 
   const handleSearch = (e: React.FormEvent) => {
@@ -116,8 +118,15 @@ const Header: React.FC = () => {
                     </span>
                   )}
                 </Link>
-                <button className="p-2.5 hover:bg-gray-100 rounded-full transition-colors">
+                <button 
+                  onClick={() => addToast('No new notifications', 'info')}
+                  className="p-2.5 hover:bg-gray-100 rounded-full transition-colors relative"
+                  title="Notifications"
+                >
                   <Bell size={20} className="text-gray-600" />
+                  {user && user.priceAlerts.length > 0 && (
+                    <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                  )}
                 </button>
                 <div className="relative">
                   <button
@@ -140,7 +149,7 @@ const Header: React.FC = () => {
                       <Link to="/dashboard" className="block px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors">Price Alerts</Link>
                       <Link to="/dashboard" className="block px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors">Click History</Link>
                       <button
-                        onClick={logout}
+                        onClick={() => { logout(); addToast('Signed out successfully', 'success'); navigate('/'); }}
                         className="w-full text-left px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors border-t"
                       >
                         Sign Out
@@ -181,7 +190,7 @@ const Header: React.FC = () => {
             <Link to="/watchlist" onClick={() => setShowMobileMenu(false)} className="block py-2 text-sm font-medium hover:text-indigo-600">Watchlist</Link>
             {isAuthenticated && <Link to="/dashboard" onClick={() => setShowMobileMenu(false)} className="block py-2 text-sm font-medium hover:text-indigo-600">Dashboard</Link>}
             {isAuthenticated ? (
-              <button onClick={() => { logout(); setShowMobileMenu(false); }} className="block py-2 text-sm font-medium text-red-500">Sign Out</button>
+              <button onClick={() => { logout(); setShowMobileMenu(false); addToast('Signed out successfully', 'success'); navigate('/'); }} className="block py-2 text-sm font-medium text-red-500">Sign Out</button>
             ) : (
               <>
                 <Link to="/login" onClick={() => setShowMobileMenu(false)} className="block py-2 text-sm font-medium text-indigo-600">Sign In</Link>

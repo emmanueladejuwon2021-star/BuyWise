@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, User } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 
 const SignupPage: React.FC = () => {
   const [name, setName] = useState('');
@@ -10,14 +11,24 @@ const SignupPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const { signup } = useAuth();
+  const { addToast } = useToast();
   const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!name || !email || !password) {
+      addToast('Please fill in all fields', 'warning');
+      return;
+    }
+    if (password.length < 8) {
+      addToast('Password must be at least 8 characters', 'warning');
+      return;
+    }
     setLoading(true);
     setTimeout(() => {
       signup(name, email, password);
       setLoading(false);
+      addToast(`Welcome to PriceWise, ${name}! Your account is ready.`, 'success');
       navigate('/');
     }, 1000);
   };

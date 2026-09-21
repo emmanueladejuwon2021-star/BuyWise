@@ -8,10 +8,11 @@ const SearchPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const query = searchParams.get('q') || '';
   const categoryFilter = searchParams.get('category') || '';
+  const storeFilter = searchParams.get('store') || '';
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortBy, setSortBy] = useState('relevance');
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000000]);
-  const [selectedStores, setSelectedStores] = useState<string[]>([]);
+  const [selectedStores, setSelectedStores] = useState<string[]>(storeFilter ? [storeFilter] : []);
   const [showFilters, setShowFilters] = useState(false);
   const [ratingFilter, setRatingFilter] = useState(0);
   const [inStockOnly, setInStockOnly] = useState(false);

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Zap, Clock, TrendingDown, Flame, Timer, ArrowRight } from 'lucide-react';
+import { Zap, TrendingDown, Flame } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import { products, getBestDeal } from '../data/products';
 

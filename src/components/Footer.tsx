@@ -1,13 +1,28 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useToast } from '../context/ToastContext';
 
 const Footer: React.FC = () => {
+  const [email, setEmail] = useState('');
+  const { addToast } = useToast();
+  const navigate = useNavigate();
+
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !email.includes('@')) {
+      addToast('Please enter a valid email address', 'warning');
+      return;
+    }
+    addToast(`Subscribed! We'll send price drop alerts to ${email}`, 'success');
+    setEmail('');
+  };
+
   return (
     <footer className="bg-gray-900 text-gray-300">
       {/* Newsletter */}
       <div className="border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-4 py-10">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+          <form onSubmit={handleSubscribe} className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div>
               <h3 className="text-xl font-bold text-white mb-1">Get Price Drop Alerts</h3>
               <p className="text-sm text-gray-400">Subscribe to get notified when prices drop on your favorite products</p>
@@ -15,14 +30,16 @@ const Footer: React.FC = () => {
             <div className="flex w-full md:w-auto">
               <input
                 type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
                 className="flex-1 md:w-72 px-4 py-3 bg-gray-800 border border-gray-700 rounded-l-xl text-sm outline-none focus:border-indigo-500 transition-colors"
               />
-              <button className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-medium rounded-r-xl hover:opacity-90 transition-opacity">
+              <button type="submit" className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-medium rounded-r-xl hover:opacity-90 transition-opacity">
                 Subscribe
               </button>
             </div>
-          </div>
+          </form>
         </div>
       </div>
 
@@ -30,7 +47,7 @@ const Footer: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
           {/* Brand */}
-          <div className="col-span-2 md:col-span-1 lg:col-span-1">
+          <div className="col-span-2 md:col-span-1">
             <Link to="/" className="flex items-center gap-2 mb-4">
               <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center">
                 <span className="text-white font-bold text-lg">P</span>
@@ -41,18 +58,16 @@ const Footer: React.FC = () => {
               Nigeria's #1 price comparison platform. Compare prices across Jumia, Konga, Amazon, and 5+ stores.
             </p>
             <div className="flex gap-3">
-              <a href="#" className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-indigo-600 transition-colors">
-                <span className="text-sm">📘</span>
-              </a>
-              <a href="#" className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-indigo-600 transition-colors">
-                <span className="text-sm">🐦</span>
-              </a>
-              <a href="#" className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-indigo-600 transition-colors">
-                <span className="text-sm">📷</span>
-              </a>
-              <a href="#" className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-indigo-600 transition-colors">
-                <span className="text-sm">💼</span>
-              </a>
+              {[
+                { icon: '📘', label: 'Facebook', url: 'https://facebook.com' },
+                { icon: '🐦', label: 'Twitter', url: 'https://twitter.com' },
+                { icon: '📷', label: 'Instagram', url: 'https://instagram.com' },
+                { icon: '💼', label: 'LinkedIn', url: 'https://linkedin.com' },
+              ].map((social, i) => (
+                <a key={i} href={social.url} target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-indigo-600 transition-colors" title={social.label}>
+                  <span className="text-sm">{social.icon}</span>
+                </a>
+              ))}
             </div>
           </div>
 
@@ -63,8 +78,8 @@ const Footer: React.FC = () => {
               <li><Link to="/" className="text-sm hover:text-indigo-400 transition-colors">Home</Link></li>
               <li><Link to="/categories" className="text-sm hover:text-indigo-400 transition-colors">Categories</Link></li>
               <li><Link to="/deals" className="text-sm hover:text-indigo-400 transition-colors">Hot Deals</Link></li>
-              <li><Link to="/trending" className="text-sm hover:text-indigo-400 transition-colors">Trending</Link></li>
-              <li><Link to="/brands" className="text-sm hover:text-indigo-400 transition-colors">Brands</Link></li>
+              <li><Link to="/search" className="text-sm hover:text-indigo-400 transition-colors">All Products</Link></li>
+              <li><Link to="/dashboard" className="text-sm hover:text-indigo-400 transition-colors">My Dashboard</Link></li>
             </ul>
           </div>
 
@@ -72,12 +87,12 @@ const Footer: React.FC = () => {
           <div>
             <h4 className="text-white font-semibold mb-4">Partner Stores</h4>
             <ul className="space-y-2.5">
-              <li><a href="#" className="text-sm hover:text-indigo-400 transition-colors">🟠 Jumia</a></li>
-              <li><a href="#" className="text-sm hover:text-indigo-400 transition-colors">🔴 Konga</a></li>
-              <li><a href="#" className="text-sm hover:text-indigo-400 transition-colors">📦 Amazon</a></li>
-              <li><a href="#" className="text-sm hover:text-indigo-400 transition-colors">🔶 AliExpress</a></li>
-              <li><a href="#" className="text-sm hover:text-indigo-400 transition-colors">🟢 Jiji</a></li>
-              <li><a href="#" className="text-sm hover:text-indigo-400 transition-colors">🔵 Slot</a></li>
+              <li><Link to="/search?store=jumia" className="text-sm hover:text-indigo-400 transition-colors">🟠 Jumia</Link></li>
+              <li><Link to="/search?store=konga" className="text-sm hover:text-indigo-400 transition-colors">🔴 Konga</Link></li>
+              <li><Link to="/search?store=amazon" className="text-sm hover:text-indigo-400 transition-colors">📦 Amazon</Link></li>
+              <li><Link to="/search?store=aliexpress" className="text-sm hover:text-indigo-400 transition-colors">🔶 AliExpress</Link></li>
+              <li><Link to="/search?store=slot" className="text-sm hover:text-indigo-400 transition-colors">🔵 Slot</Link></li>
+              <li><Link to="/search?store=ebay" className="text-sm hover:text-indigo-400 transition-colors">🟡 eBay</Link></li>
             </ul>
           </div>
 
@@ -85,11 +100,11 @@ const Footer: React.FC = () => {
           <div>
             <h4 className="text-white font-semibold mb-4">Support</h4>
             <ul className="space-y-2.5">
-              <li><a href="#" className="text-sm hover:text-indigo-400 transition-colors">Help Center</a></li>
-              <li><a href="#" className="text-sm hover:text-indigo-400 transition-colors">Contact Us</a></li>
-              <li><a href="#" className="text-sm hover:text-indigo-400 transition-colors">FAQs</a></li>
-              <li><a href="#" className="text-sm hover:text-indigo-400 transition-colors">Report a Bug</a></li>
-              <li><a href="#" className="text-sm hover:text-indigo-400 transition-colors">Feedback</a></li>
+              <li><button onClick={() => addToast('Help center coming soon!', 'info')} className="text-sm hover:text-indigo-400 transition-colors text-left">Help Center</button></li>
+              <li><button onClick={() => addToast('Email us at help@pricewise.ng', 'info')} className="text-sm hover:text-indigo-400 transition-colors text-left">Contact Us</button></li>
+              <li><button onClick={() => addToast('FAQs coming soon!', 'info')} className="text-sm hover:text-indigo-400 transition-colors text-left">FAQs</button></li>
+              <li><button onClick={() => addToast('Thanks for your feedback!', 'success')} className="text-sm hover:text-indigo-400 transition-colors text-left">Send Feedback</button></li>
+              <li><button onClick={() => addToast('Bug report form coming soon!', 'info')} className="text-sm hover:text-indigo-400 transition-colors text-left">Report a Bug</button></li>
             </ul>
           </div>
 
@@ -97,11 +112,11 @@ const Footer: React.FC = () => {
           <div>
             <h4 className="text-white font-semibold mb-4">Legal</h4>
             <ul className="space-y-2.5">
-              <li><a href="#" className="text-sm hover:text-indigo-400 transition-colors">Privacy Policy</a></li>
-              <li><a href="#" className="text-sm hover:text-indigo-400 transition-colors">Terms of Service</a></li>
-              <li><a href="#" className="text-sm hover:text-indigo-400 transition-colors">Cookie Policy</a></li>
-              <li><a href="#" className="text-sm hover:text-indigo-400 transition-colors">Affiliate Disclosure</a></li>
-              <li><a href="#" className="text-sm hover:text-indigo-400 transition-colors">About Us</a></li>
+              <li><button onClick={() => addToast('Privacy Policy page coming soon!', 'info')} className="text-sm hover:text-indigo-400 transition-colors text-left">Privacy Policy</button></li>
+              <li><button onClick={() => addToast('Terms of Service page coming soon!', 'info')} className="text-sm hover:text-indigo-400 transition-colors text-left">Terms of Service</button></li>
+              <li><button onClick={() => addToast('Cookie Policy page coming soon!', 'info')} className="text-sm hover:text-indigo-400 transition-colors text-left">Cookie Policy</button></li>
+              <li><button onClick={() => addToast('Affiliate Disclosure: We earn commissions on purchases made through our links at no extra cost to you.', 'info', 6000)} className="text-sm hover:text-indigo-400 transition-colors text-left">Affiliate Disclosure</button></li>
+              <li><button onClick={() => addToast('About page coming soon!', 'info')} className="text-sm hover:text-indigo-400 transition-colors text-left">About Us</button></li>
             </ul>
           </div>
         </div>
@@ -112,15 +127,14 @@ const Footer: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 py-5">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-xs text-gray-500">
-              © 2024 PriceWise. All rights reserved. Prices are updated every 30 minutes.
+              © 2024 PriceWise. All rights reserved. Prices are updated every 15 minutes.
             </p>
             <div className="flex items-center gap-4">
               <span className="text-xs text-gray-500">Payment Partners:</span>
               <div className="flex items-center gap-2">
-                <span className="bg-gray-800 px-2 py-1 rounded text-xs">Paystack</span>
-                <span className="bg-gray-800 px-2 py-1 rounded text-xs">Flutterwave</span>
-                <span className="bg-gray-800 px-2 py-1 rounded text-xs">Visa</span>
-                <span className="bg-gray-800 px-2 py-1 rounded text-xs">Mastercard</span>
+                {['Paystack', 'Flutterwave', 'Visa', 'Mastercard'].map((partner, i) => (
+                  <span key={i} className="bg-gray-800 px-2 py-1 rounded text-xs hover:bg-gray-700 cursor-default">{partner}</span>
+                ))}
               </div>
             </div>
           </div>

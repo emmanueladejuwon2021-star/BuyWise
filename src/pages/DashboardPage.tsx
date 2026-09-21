@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Heart, Bell, Clock, ExternalLink, Settings, MapPin, Trash2, TrendingDown, Eye, ShoppingBag, ChevronRight, ToggleLeft, ToggleRight } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Heart, Bell, Clock, ExternalLink, Settings, MapPin, Trash2, TrendingDown, Eye, ChevronRight, ToggleLeft, ToggleRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import { products, getBestDeal } from '../data/products';
 
 const DashboardPage: React.FC = () => {
   const { user, isAuthenticated, removeFromWatchlist, removePriceAlert, updatePreferences, updateNotificationSettings } = useAuth();
+  const { addToast } = useToast();
+  const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState<'overview' | 'watchlist' | 'alerts' | 'history' | 'settings'>('overview');
 
   if (!isAuthenticated || !user) {
@@ -193,8 +196,9 @@ const DashboardPage: React.FC = () => {
                             Compare Prices
                           </Link>
                           <button
-                            onClick={() => removeFromWatchlist(product.id)}
+                            onClick={() => { removeFromWatchlist(product.id); addToast('Removed from watchlist', 'info'); }}
                             className="p-1.5 text-gray-400 hover:text-red-500 rounded-lg hover:bg-red-50 transition-colors"
+                            title="Remove from watchlist"
                           >
                             <Trash2 size={14} />
                           </button>
@@ -239,8 +243,9 @@ const DashboardPage: React.FC = () => {
                       </div>
                     </div>
                     <button
-                      onClick={() => removePriceAlert(alert.id)}
+                      onClick={() => { removePriceAlert(alert.id); addToast('Price alert removed', 'info'); }}
                       className="p-2 text-gray-400 hover:text-red-500 rounded-lg hover:bg-red-50 transition-colors"
+                      title="Remove alert"
                     >
                       <Trash2 size={16} />
                     </button>

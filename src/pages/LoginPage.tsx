@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -9,14 +10,20 @@ const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
+  const { addToast } = useToast();
   const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email || !password) {
+      addToast('Please fill in all fields', 'warning');
+      return;
+    }
     setLoading(true);
     setTimeout(() => {
       login(email, password);
       setLoading(false);
+      addToast('Welcome back! You are now signed in.', 'success');
       navigate('/');
     }, 1000);
   };
@@ -104,10 +111,16 @@ const LoginPage: React.FC = () => {
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3 mt-4">
-              <button className="flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+              <button
+                onClick={() => addToast('Google OAuth coming soon! Use email login for now.', 'info')}
+                className="flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+              >
                 <span>🔵</span> Google
               </button>
-              <button className="flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+              <button
+                onClick={() => addToast('Facebook login coming soon! Use email login for now.', 'info')}
+                className="flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+              >
                 <span>📘</span> Facebook
               </button>
             </div>

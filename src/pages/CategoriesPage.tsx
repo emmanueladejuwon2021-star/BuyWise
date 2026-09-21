@@ -1,8 +1,12 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useToast } from '../context/ToastContext';
 import { categories } from '../data/products';
 
 const CategoriesPage: React.FC = () => {
+  const navigate = useNavigate();
+  const { addToast } = useToast();
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -42,7 +46,7 @@ const CategoriesPage: React.FC = () => {
               <Link
                 key={i}
                 to={`/search?q=${brand.toLowerCase()}`}
-                className="bg-white rounded-2xl border border-gray-100 p-4 text-center hover:shadow-md hover:border-indigo-200 transition-all"
+                className="bg-white rounded-2xl border border-gray-100 p-4 text-center hover:shadow-md hover:border-indigo-200 transition-all block"
               >
                 <div className="w-12 h-12 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-2">
                   <span className="text-lg font-bold text-gray-600">{brand.charAt(0)}</span>

@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, TrendingUp, Zap, Shield, Clock, BarChart3, Sparkles, ChevronRight } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
+import { useToast } from '../context/ToastContext';
 import { products, categories, trendingSearches, stores, getBestDeal } from '../data/products';
 
 const HomePage: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState('all');
+  const { addToast } = useToast();
+  const navigate = useNavigate();
 
   const filteredProducts = activeCategory === 'all'
     ? products
@@ -117,7 +120,11 @@ const HomePage: React.FC = () => {
         <h2 className="text-2xl font-bold text-gray-900 mb-6">We Compare Prices From</h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {stores.map(store => (
-            <div key={store.id} className="bg-white rounded-2xl p-5 border border-gray-100 hover:shadow-md transition-all flex items-center gap-3">
+            <button
+              key={store.id}
+              onClick={() => navigate(`/search?store=${store.id}`)}
+              className="bg-white rounded-2xl p-5 border border-gray-100 hover:shadow-md hover:border-indigo-200 transition-all flex items-center gap-3 text-left w-full"
+            >
               <span className="text-3xl">{store.logo}</span>
               <div>
                 <p className="font-semibold text-gray-900 text-sm">{store.name}</p>
@@ -126,7 +133,7 @@ const HomePage: React.FC = () => {
                   <span className="text-xs text-gray-500">{store.rating} • {store.country}</span>
                 </div>
               </div>
-            </div>
+            </button>
           ))}
         </div>
       </section>
