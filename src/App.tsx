@@ -14,6 +14,13 @@ import CategoriesPage from './pages/CategoriesPage';
 import DashboardPage from './pages/DashboardPage';
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const location = useLocation();
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
+
+  if (isAuthPage) {
+    return <>{children}</>;
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       <Header />
@@ -23,45 +30,23 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   );
 };
 
-const AuthLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  return <div className="flex flex-col min-h-screen">{children}</div>;
-};
-
-const AppRoutes: React.FC = () => {
-  const location = useLocation();
-  const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
-
-  if (isAuthPage) {
-    return (
-      <AuthLayout>
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignupPage />} />
-        </Routes>
-      </AuthLayout>
-    );
-  }
-
-  return (
-    <Layout>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/search" element={<SearchPage />} />
-        <Route path="/product/:id" element={<ProductDetailPage />} />
-        <Route path="/deals" element={<DealsPage />} />
-        <Route path="/watchlist" element={<WatchlistPage />} />
-        <Route path="/categories" element={<CategoriesPage />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
-      </Routes>
-    </Layout>
-  );
-};
-
 const App: React.FC = () => {
   return (
     <AuthProvider>
       <Router>
-        <AppRoutes />
+        <Layout>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/product/:id" element={<ProductDetailPage />} />
+            <Route path="/deals" element={<DealsPage />} />
+            <Route path="/watchlist" element={<WatchlistPage />} />
+            <Route path="/categories" element={<CategoriesPage />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} />
+          </Routes>
+        </Layout>
       </Router>
     </AuthProvider>
   );
