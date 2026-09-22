@@ -1,40 +1,31 @@
 /**
- * PHASE 3 - INGESTION: Real Jumia Scraper
- * 
- * Production-ready scraper for Jumia Nigeria with real DOM parsing, 
- * live price extraction, and real availability verification.
+ * PHASE 3 - INGESTION: Real Kara Nigeria Scraper
  */
 
 import { BaseScraper, ScrapedProduct, ScrapeResult } from './BaseScraper';
 import { ScraperOptions } from '../config/scraperConfig';
 import { RealLiveScraper } from '../../services/realLiveScraper';
 
-export class JumiaScraper extends BaseScraper {
+export class KaraScraper extends BaseScraper {
   constructor() {
-    super('jumia');
+    super('kara');
   }
 
-  /**
-   * Scrape a real Jumia product page or search URL
-   */
   protected async scrapePage(url: string, options: ScraperOptions): Promise<ScrapedProduct[]> {
-    console.log(`[JumiaScraper] Initiating real live scrape for: ${url}`);
-    const results = await RealLiveScraper.scrapeJumia(url);
-    if (results.length === 0) {
-      // If URL was a specific item, attempt arbitrary live schema extraction
+    console.log(`[KaraScraper] Initiating real live scrape for: ${url}`);
+    const query = url.includes('?') ? new URL(url).searchParams.get('q') || 'electronics' : url.split('/').pop() || 'electronics';
+    const results = await RealLiveScraper.scrapeSlotOrKara('kara', query);
+    if (results.length === 0 && url.startsWith('http')) {
       const single = await RealLiveScraper.scrapeArbitraryUrl(url);
       return [single];
     }
     return results;
   }
 
-  /**
-   * Scrape live category or search query from Jumia
-   */
   async scrapeCategory(category: string, maxProducts: number = 10): Promise<ScrapeResult> {
     const startTime = Date.now();
     try {
-      const products = await RealLiveScraper.scrapeJumia(category);
+      const products = await RealLiveScraper.scrapeSlotOrKara('kara', category);
       return {
         success: products.length > 0,
         products: products.slice(0, maxProducts),

@@ -2,7 +2,7 @@
  * PHASE 3 - AUTOMATED DATA INGESTION & SCRAPING ENGINE
  * 
  * Main entry point for the ingestion module.
- * Exports all public APIs for queues, scrapers, pipeline, and monitoring.
+ * Exports all real scrapers, queues, pipeline, and monitoring.
  */
 
 // Queues
@@ -18,11 +18,19 @@ export type { FeedJobData } from './queues/FeedIngestionQueue';
 export { PriceValidationQueue } from './queues/PriceValidationQueue';
 export type { PriceValidationJobData } from './queues/PriceValidationQueue';
 
-// Scrapers
+// Real Scrapers
 export { BaseScraper } from './scrapers/BaseScraper';
 export type { ScrapedProduct, ScrapeResult } from './scrapers/BaseScraper';
 
 export { JumiaScraper } from './scrapers/JumiaScraper';
+export { KongaScraper } from './scrapers/KongaScraper';
+export { SlotScraper } from './scrapers/SlotScraper';
+export { KaraScraper } from './scrapers/KaraScraper';
+export { SellerStoreScraper } from './scrapers/SellerStoreScraper';
+
+// Real Scraper Service
+export { RealLiveScraper } from '../services/realLiveScraper';
+export type { LiveScrapeOptions } from '../services/realLiveScraper';
 
 // Configuration
 export {

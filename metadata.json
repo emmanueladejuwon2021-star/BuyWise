@@ -1,0 +1,8 @@
+{
+  "name": "PriceWise",
+  "description": "Smart price comparison across top e-commerce stores in real-time.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

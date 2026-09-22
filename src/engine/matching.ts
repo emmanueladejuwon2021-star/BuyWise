@@ -152,9 +152,9 @@ export function buildMasterProducts(products: Product[]): MasterProduct[] {
   for (const product of products) {
     if (processed.has(product.id)) continue;
     
-    // Find all matches above threshold
-    const matches = findMatches(product, products, 85)
-      .filter(m => m.confidenceScore >= 85);
+    // Find all matches above threshold or title overlap
+    const matches = findMatches(product, products, 50)
+      .filter(m => m.confidenceScore >= 50 || m.productB.name.toLowerCase() === product.name.toLowerCase());
     
     const group = [product, ...matches.map(m => m.productB)];
     group.forEach(p => processed.add(p.id));

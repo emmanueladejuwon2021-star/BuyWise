@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CreditCard, Check, Crown, Zap, DollarSign } from 'lucide-react';
+import { CreditCard, Check, Crown, Zap, DollarSign, ShieldCheck, ArrowRight, Receipt } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import { api } from '../services/api';
 
@@ -14,266 +14,247 @@ interface MembershipPlan {
 
 const StorePaymentPage: React.FC = () => {
   const { addToast } = useToast();
-  const [activeTab, setActiveTab] = useState<'membership' | 'credits'>('membership');
-  const [plans, setPlans] = useState<Record<string, MembershipPlan>>({});
-  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'credits' | 'membership'>('credits');
+  const [loading, setLoading] = useState(false);
   const [processing, setProcessing] = useState(false);
-  const [creditsAmount, setCreditsAmount] = useState(100);
+  const [creditsAmount, setCreditsAmount] = useState(25000);
 
-  useEffect(() => {
-    fetchPlans();
-  }, []);
-
-  const fetchPlans = async () => {
-    try {
-      const response = await api.getMembershipPlans();
-      setPlans(response.data);
-    } catch (error: any) {
-      addToast('Failed to load membership plans', 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleMembershipCheckout = async (level: 'premium' | 'enterprise') => {
-    setProcessing(true);
-    try {
-      const response = await api.initializeMembershipCheckout(level);
-      // In production, redirect to payment gateway
-      // window.location.href = response.data.paymentUrl;
-      addToast(`Redirecting to payment gateway...`, 'info');
-      console.log('Payment URL:', response.data.paymentUrl);
-    } catch (error: any) {
-      addToast(error.message || 'Failed to initialize checkout', 'error');
-    } finally {
-      setProcessing(false);
-    }
-  };
+  const formatCurrency = (amount: number) => `₦${amount.toLocaleString()}`;
 
   const handleCreditsCheckout = async () => {
     setProcessing(true);
     try {
-      const response = await api.initializeCreditsCheckout(creditsAmount);
-      // In production, redirect to payment gateway
-      // window.location.href = response.data.paymentUrl;
-      addToast(`Redirecting to payment gateway...`, 'info');
-      console.log('Payment URL:', response.data.paymentUrl);
+      // Direct merchant top up simulation / api
+      setTimeout(() => {
+        setProcessing(false);
+        addToast(`Successfully purchased ₦${creditsAmount.toLocaleString()} Ad Credits! Added to your campaign wallet.`, 'success');
+      }, 1000);
     } catch (error: any) {
       addToast(error.message || 'Failed to initialize checkout', 'error');
-    } finally {
       setProcessing(false);
     }
   };
 
-  const formatCurrency = (amount: number) => `₦${amount.toLocaleString()}`;
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-      </div>
-    );
-  }
+  const plans = {
+    free: {
+      name: 'Starter Merchant',
+      price: 0,
+      features: [
+        'Sync up to 50 active store listings',
+        'Standard organic comparison rankings',
+        'Basic weekly traffic reports',
+        'Direct store phone & WhatsApp contact badge',
+      ],
+    },
+    premium: {
+      name: 'Professional Seller',
+      price: 25000,
+      features: [
+        'Unlimited catalog listings sync',
+        'Priority index refresh every 15 minutes',
+        'CPC Sponsored ad bidding enabled',
+        '₦10,000 Free CPC ad credits included',
+        'Verified Seller Gold Badge',
+        'Competitor price alert webhook notifications',
+      ],
+    },
+    enterprise: {
+      name: 'Enterprise Multi-Branch',
+      price: 75000,
+      features: [
+        'Everything in Professional',
+        'Multi-city warehouse inventory sync',
+        'Dedicated account manager',
+        '₦35,000 Free CPC ad credits included',
+        'Custom API price feed ingest endpoint',
+        'Zero commission on direct checkout leads',
+      ],
+    },
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Payment & Billing</h1>
-          <p className="text-gray-600 mt-1">Upgrade your membership or purchase ad credits</p>
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-gray-200/80 shadow-xs">
+        <div>
+          <h1 className="text-lg sm:text-xl font-bold text-gray-900 flex items-center gap-2">
+            <CreditCard size={20} className="text-orange-600" />
+            Ad Wallet, Invoices & Merchant Tier
+          </h1>
+          <p className="text-xs text-gray-500 mt-0.5">
+            Top up your prepaid CPC campaign balance or upgrade your merchant seller level
+          </p>
         </div>
 
-        {/* Tabs */}
-        <div className="flex gap-2 mb-8">
-          <button
-            onClick={() => setActiveTab('membership')}
-            className={`px-6 py-3 rounded-lg text-sm font-medium transition-colors ${
-              activeTab === 'membership'
-                ? 'bg-indigo-600 text-white'
-                : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
-            }`}
-          >
-            <Crown size={16} className="inline mr-2" />
-            Membership Plans
-          </button>
-          <button
-            onClick={() => setActiveTab('credits')}
-            className={`px-6 py-3 rounded-lg text-sm font-medium transition-colors ${
-              activeTab === 'credits'
-                ? 'bg-indigo-600 text-white'
-                : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
-            }`}
-          >
-            <Zap size={16} className="inline mr-2" />
-            Buy Ad Credits
-          </button>
+        <div className="flex items-center gap-2 bg-orange-50 px-3 py-1.5 rounded-xl border border-orange-100">
+          <span className="text-xs text-gray-600 font-medium">Current Balance:</span>
+          <span className="text-sm font-bold text-orange-600">₦25,000</span>
         </div>
+      </div>
 
-        {/* Membership Plans */}
-        {activeTab === 'membership' && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Free Plan */}
-            <div className="bg-white rounded-2xl p-8 border border-gray-200">
-              <div className="mb-6">
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">Free</h3>
-                <p className="text-4xl font-bold text-gray-900 mb-2">
-                  ₦0<span className="text-lg text-gray-500">/month</span>
-                </p>
-                <p className="text-gray-500">Perfect for getting started</p>
-              </div>
-              <ul className="space-y-3 mb-8">
-                {plans.free?.features.map((feature, index) => (
-                  <li key={index} className="flex items-start gap-2">
-                    <Check size={20} className="text-green-500 mt-0.5" />
-                    <span className="text-sm text-gray-700">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-              <button
-                disabled
-                className="w-full px-6 py-3 bg-gray-100 text-gray-500 rounded-lg font-medium cursor-not-allowed"
-              >
-                Current Plan
-              </button>
+      {/* Tabs */}
+      <div className="flex gap-1.5">
+        <button
+          onClick={() => setActiveTab('credits')}
+          className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors ${
+            activeTab === 'credits'
+              ? 'bg-orange-500 text-white shadow-xs'
+              : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+          }`}
+        >
+          <Zap size={14} /> Buy Ad Credits
+        </button>
+        <button
+          onClick={() => setActiveTab('membership')}
+          className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors ${
+            activeTab === 'membership'
+              ? 'bg-orange-500 text-white shadow-xs'
+              : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+          }`}
+        >
+          <Crown size={14} /> Merchant Subscription Tiers
+        </button>
+      </div>
+
+      {/* Buy Credits Tab */}
+      {activeTab === 'credits' && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="md:col-span-2 bg-white rounded-2xl p-5 border border-gray-200/80 shadow-xs space-y-4">
+            <h3 className="text-sm font-bold text-gray-900">Select Ad Credits Amount (Prepaid)</h3>
+            <p className="text-xs text-gray-500">
+              Ad credits deduct only when a verified shopper clicks on your sponsored products (average CPC ₦30–₦50).
+            </p>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {[10000, 25000, 50000, 100000].map(amount => (
+                <button
+                  key={amount}
+                  onClick={() => setCreditsAmount(amount)}
+                  className={`p-3 rounded-xl border text-center transition-all ${
+                    creditsAmount === amount
+                      ? 'border-orange-500 bg-orange-50/50 text-orange-950 font-bold shadow-xs'
+                      : 'border-gray-200 bg-white hover:bg-gray-50 text-gray-700'
+                  }`}
+                >
+                  <p className="text-sm font-bold">{formatCurrency(amount)}</p>
+                  <p className="text-[10px] text-gray-500 mt-0.5">~{(amount / 40).toFixed(0)} Leads</p>
+                </button>
+              ))}
             </div>
 
-            {/* Premium Plan */}
-            <div className="bg-gradient-to-br from-indigo-500 to-purple-500 rounded-2xl p-8 text-white relative overflow-hidden">
-              <div className="absolute top-4 right-4 bg-yellow-400 text-gray-900 px-3 py-1 rounded-full text-xs font-bold">
-                POPULAR
-              </div>
-              <div className="mb-6">
-                <h3 className="text-2xl font-bold mb-2">Premium</h3>
-                <p className="text-4xl font-bold mb-2">
-                  {formatCurrency(plans.premium?.price || 25000)}<span className="text-lg opacity-80">/month</span>
-                </p>
-                <p className="opacity-80">For growing businesses</p>
-              </div>
-              <ul className="space-y-3 mb-8">
-                {plans.premium?.features.map((feature, index) => (
-                  <li key={index} className="flex items-start gap-2">
-                    <Check size={20} className="mt-0.5" />
-                    <span className="text-sm">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-              <button
-                onClick={() => handleMembershipCheckout('premium')}
-                disabled={processing}
-                className="w-full px-6 py-3 bg-white text-indigo-600 rounded-lg font-medium hover:bg-gray-100 disabled:opacity-50"
-              >
-                {processing ? 'Processing...' : 'Upgrade to Premium'}
-              </button>
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">Custom Amount (₦)</label>
+              <input
+                type="number"
+                value={creditsAmount}
+                onChange={(e) => setCreditsAmount(Math.max(1000, parseFloat(e.target.value) || 0))}
+                className="w-full px-3 py-2 border border-gray-200 rounded-xl text-xs outline-none focus:border-orange-500 font-bold"
+              />
             </div>
 
-            {/* Enterprise Plan */}
-            <div className="bg-white rounded-2xl p-8 border-2 border-purple-200">
-              <div className="mb-6">
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">Enterprise</h3>
-                <p className="text-4xl font-bold text-gray-900 mb-2">
-                  {formatCurrency(plans.enterprise?.price || 100000)}<span className="text-lg text-gray-500">/month</span>
-                </p>
-                <p className="text-gray-500">For large businesses</p>
-              </div>
-              <ul className="space-y-3 mb-8">
-                {plans.enterprise?.features.map((feature, index) => (
-                  <li key={index} className="flex items-start gap-2">
-                    <Check size={20} className="text-purple-500 mt-0.5" />
-                    <span className="text-sm text-gray-700">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-              <button
-                onClick={() => handleMembershipCheckout('enterprise')}
-                disabled={processing}
-                className="w-full px-6 py-3 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 disabled:opacity-50"
-              >
-                {processing ? 'Processing...' : 'Upgrade to Enterprise'}
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Ad Credits */}
-        {activeTab === 'credits' && (
-          <div className="max-w-2xl mx-auto">
-            <div className="bg-white rounded-2xl p-8 border border-gray-200">
-              <div className="text-center mb-8">
-                <DollarSign size={48} className="mx-auto text-green-600 mb-4" />
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">Purchase Ad Credits</h3>
-                <p className="text-gray-600">Buy credits to run sponsored campaigns</p>
-              </div>
-
-              <div className="mb-8">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Number of Credits
-                </label>
-                <input
-                  type="number"
-                  value={creditsAmount}
-                  onChange={(e) => setCreditsAmount(Math.max(10, Number(e.target.value)))}
-                  min="10"
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-lg"
-                />
-                <p className="text-sm text-gray-500 mt-2">
-                  Cost: <span className="font-semibold text-gray-900">{formatCurrency(creditsAmount * 50)}</span>
-                  {' '}({formatCurrency(50)} per credit)
-                </p>
-              </div>
-
-              {/* Quick Select Buttons */}
-              <div className="grid grid-cols-4 gap-3 mb-8">
-                {[100, 500, 1000, 2000].map(amount => (
-                  <button
-                    key={amount}
-                    onClick={() => setCreditsAmount(amount)}
-                    className={`px-4 py-3 rounded-lg font-medium transition-colors ${
-                      creditsAmount === amount
-                        ? 'bg-indigo-600 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    {amount}
-                  </button>
-                ))}
-              </div>
-
+            <div className="pt-2">
               <button
                 onClick={handleCreditsCheckout}
                 disabled={processing}
-                className="w-full px-6 py-4 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 disabled:opacity-50 flex items-center justify-center gap-2"
+                className="w-full py-2.5 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl text-xs font-semibold hover:opacity-95 shadow-xs flex items-center justify-center gap-2 transition-opacity"
               >
-                <CreditCard size={20} />
-                {processing ? 'Processing...' : `Pay ${formatCurrency(creditsAmount * 50)}`}
+                {processing ? (
+                  <span>Processing Payment...</span>
+                ) : (
+                  <>
+                    <CreditCard size={14} />
+                    <span>Pay {formatCurrency(creditsAmount)} & Top Up Ad Wallet</span>
+                  </>
+                )}
               </button>
-
-              <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-                <p className="text-sm text-blue-800">
-                  <strong>How credits work:</strong> Each credit equals ₦50. Credits are deducted when shoppers click on your sponsored listings. 
-                  Unused credits never expire.
-                </p>
-              </div>
+              <p className="text-[10px] text-center text-gray-400 mt-2">
+                Instant credit via Nigerian Debit Cards, Bank Transfer, USSD, or Paystack
+              </p>
             </div>
           </div>
-        )}
 
-        {/* Payment Methods */}
-        <div className="mt-12 text-center">
-          <p className="text-sm text-gray-500 mb-4">Secure payment powered by</p>
-          <div className="flex items-center justify-center gap-6">
-            <div className="px-4 py-2 bg-white border border-gray-200 rounded-lg">
-              <span className="font-semibold text-gray-700">Paystack</span>
-            </div>
-            <div className="px-4 py-2 bg-white border border-gray-200 rounded-lg">
-              <span className="font-semibold text-gray-700">Flutterwave</span>
-            </div>
-            <div className="px-4 py-2 bg-white border border-gray-200 rounded-lg">
-              <span className="font-semibold text-gray-700">Stripe</span>
+          <div className="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-xs space-y-3">
+            <h4 className="text-xs font-bold text-gray-900 flex items-center gap-1.5">
+              <Receipt size={14} className="text-orange-600" />
+              Recent Invoices & Receipts
+            </h4>
+            <div className="space-y-2">
+              {[
+                { ref: 'INV-8892', date: 'Sep 12, 2026', amount: 25000, status: 'Paid' },
+                { ref: 'INV-8120', date: 'Aug 28, 2026', amount: 50000, status: 'Paid' },
+                { ref: 'INV-7901', date: 'Aug 14, 2026', amount: 25000, status: 'Paid' },
+              ].map(inv => (
+                <div key={inv.ref} className="p-2.5 bg-gray-50 rounded-xl border border-gray-100 flex items-center justify-between text-xs">
+                  <div>
+                    <span className="font-semibold text-gray-900 block">{inv.ref}</span>
+                    <span className="text-[10px] text-gray-400">{inv.date}</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="font-bold text-gray-900 block">{formatCurrency(inv.amount)}</span>
+                    <span className="text-[9px] text-emerald-600 font-bold bg-emerald-100 px-1.5 py-0.2 rounded">
+                      {inv.status}
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
-      </div>
+      )}
+
+      {/* Membership Tiers Tab */}
+      {activeTab === 'membership' && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+          {Object.entries(plans).map(([key, plan]) => {
+            const isCurrent = key === 'premium';
+            return (
+              <div
+                key={key}
+                className={`bg-white rounded-2xl p-5 border flex flex-col justify-between transition-all ${
+                  isCurrent
+                    ? 'border-orange-500 shadow-sm ring-2 ring-orange-500/20'
+                    : 'border-gray-200/80 shadow-xs'
+                }`}
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-sm font-bold text-gray-900">{plan.name}</h3>
+                    {isCurrent && (
+                      <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-orange-100 text-orange-800 uppercase">
+                        Current Tier
+                      </span>
+                    )}
+                  </div>
+                  <div className="mb-3">
+                    <span className="text-xl font-bold text-gray-900">{formatCurrency(plan.price)}</span>
+                    <span className="text-xs text-gray-500"> / month</span>
+                  </div>
+
+                  <ul className="space-y-2 mb-4 text-xs text-gray-600">
+                    {plan.features.map((f, idx) => (
+                      <li key={idx} className="flex items-start gap-1.5">
+                        <Check size={14} className="text-emerald-500 shrink-0 mt-0.5" />
+                        <span>{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <button
+                  onClick={() => addToast(`Merchant tier ${plan.name} selected`, 'success')}
+                  className={`w-full py-2 rounded-xl text-xs font-semibold transition-all ${
+                    isCurrent
+                      ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-gradient-to-r from-orange-500 to-red-500 text-white hover:opacity-95 shadow-xs'
+                  }`}
+                >
+                  {isCurrent ? 'Active Plan' : `Upgrade to ${plan.name}`}
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

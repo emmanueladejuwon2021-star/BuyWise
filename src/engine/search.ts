@@ -13,6 +13,7 @@
 
 import { Product, StoreListing } from '../types';
 import { products, stores, categories } from '../data/products';
+import { mongoAtlas } from '../services/mongodbAtlas';
 import { parseSearchIntent, normalizeString, stringSimilarity, tokenOverlap } from './normalization';
 import { buildMasterProducts, MasterProduct, findMasterForProduct } from './matching';
 import {
@@ -20,15 +21,16 @@ import {
   calculateTotalPrice, parseDeliveryHours, isPriceStale, SortMode
 } from './ranking';
 import { cache, CacheKeys } from './cache';
+import { RealLiveScraper } from '../services/realLiveScraper';
 
-// Build master products once (simulating database state)
-let masterProductsCache: MasterProduct[] | null = null;
+export function getMasterProducts(): MasterProduct[] {
+  const stored = mongoAtlas.getProductsSync();
+  const allMap = new Map<string, Product>();
 
-function getMasterProducts(): MasterProduct[] {
-  if (!masterProductsCache) {
-    masterProductsCache = buildMasterProducts(products);
-  }
-  return masterProductsCache;
+  products.forEach(p => allMap.set(p.id, p));
+  stored.forEach(p => allMap.set(p.id, p));
+
+  return buildMasterProducts(Array.from(allMap.values()));
 }
 
 /**
@@ -371,26 +373,34 @@ export function getProductDetail(masterProductId: string, _userLocation?: string
   
   const masterProducts = getMasterProducts();
   
-  // Find the master product (try direct ID or search through source products)
-  let product = masterProducts.find(mp => mp.id === masterProductId || mp.id === `master_${masterProductId}`);
+  // Find the master product (try direct ID, master_ prefix, or slug matching)
+  let product = masterProducts.find(mp => 
+    mp.id === masterProductId || 
+    mp.id === `master_${masterProductId}` ||
+    mp.sourceProducts.some(p => p.id === masterProductId || p.slug === masterProductId)
+  );
   
   if (!product) {
-    // Try finding by source product ID
-    product = masterProducts.find(mp => 
-      mp.sourceProducts.some(p => p.id === masterProductId)
+    // Try finding by single product in mongoAtlas or products
+    const stored = mongoAtlas.getProductsSync();
+    const allProducts = [...stored, ...products];
+    const match = allProducts.find(p => 
+      p.id === masterProductId || 
+      p.slug === masterProductId || 
+      p.id.includes(masterProductId) ||
+      masterProductId.includes(p.id)
     );
+
+    if (match) {
+      const built = buildMasterProducts([match]);
+      if (built.length > 0) {
+        product = built[0];
+      }
+    }
   }
-  
+
   if (!product) {
-    // Return error response
-    return {
-      success: false,
-      product: null as unknown as MasterProduct,
-      listings: [],
-      summaryTags: {},
-      executionTimeMs: parseFloat((performance.now() - startTime).toFixed(2)),
-      cacheHit: false,
-    };
+    return null as any;
   }
   
   // Score and sort listings
@@ -471,8 +481,6 @@ export function getCategoryFacets(categoryId?: string): CategoryFacetsResponse {
 export function invalidatePriceCache(): void {
   cache.invalidatePattern('search:*');
   cache.invalidatePattern('product:*');
-  // Reset master products to force rebuild
-  masterProductsCache = null;
 }
 
 /**

@@ -1,10 +1,13 @@
 import React, { useState, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Star, Heart, Share2, Bell, ExternalLink, Truck, Shield, Clock, ChevronDown, ChevronUp, Check, TrendingDown, Eye, Zap, BarChart3, AlertTriangle, Award, Timer, Tag } from 'lucide-react';
+import { Star, Heart, Share2, Bell, ExternalLink, Truck, Shield, Clock, ChevronDown, ChevronUp, Check, TrendingDown, Eye, Zap, BarChart3, AlertTriangle, Award, Timer, Tag, Sparkles, Users, ArrowUpRight, ArrowDownRight, Scale, Download } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { products, stores } from '../data/products';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { useRegion } from '../context/RegionContext';
+import { predictPriceTrajectory } from '../utils/pricePredictor';
+import { CollaborativeListModal } from '../components/CollaborativeListModal';
 import { getProductDetail, ScoredListing, sortListings, computeSummaryTags, calculateTotalPrice, isPriceStale, parseDeliveryHours, calculateBestValueScore } from '../engine';
 
 const ProductDetailPage: React.FC = () => {
@@ -12,16 +15,19 @@ const ProductDetailPage: React.FC = () => {
   const navigate = useNavigate();
   const { isInWatchlist, addToWatchlist, removeFromWatchlist, isAuthenticated, addClickLog } = useAuth();
   const { addToast } = useToast();
+  const { formatPrice } = useRegion();
   const [showAllSpecs, setShowAllSpecs] = useState(false);
   const [activeTab, setActiveTab] = useState<'prices' | 'history' | 'specs' | 'reviews'>('prices');
   const [sortBy, setSortBy] = useState<'total-cost' | 'price' | 'rating' | 'delivery' | 'best-value'>('total-cost');
   const [historyRange, setHistoryRange] = useState<30 | 90 | 180>(90);
   const [selectedImage, setSelectedImage] = useState(0);
   const [showAlertModal, setShowAlertModal] = useState(false);
+  const [showCollabModal, setShowCollabModal] = useState(false);
   const [targetPrice, setTargetPrice] = useState('');
   const [alertChannels, setAlertChannels] = useState<string[]>(['email', 'push']);
   const [redirecting, setRedirecting] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+
 
   // Use the engine to get product detail
   const detail = useMemo(() => {
@@ -69,7 +75,6 @@ const ProductDetailPage: React.FC = () => {
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   }, [product, historyRange]);
 
-  const formatPrice = (price: number, currency: string) => currency === '₦' ? `₦${price.toLocaleString()}` : `$${price.toLocaleString()}`;
   const specs = Object.entries(product.specifications);
   const visibleSpecs = showAllSpecs ? specs : specs.slice(0, 6);
 
@@ -110,6 +115,24 @@ const ProductDetailPage: React.FC = () => {
     else { addToWatchlist(productId); addToast('Added to watchlist!', 'success'); }
   };
 
+  const handleExportCSV = () => {
+    const csvRows = ['Date,Store,Price (NGN)'];
+    product.sourceProducts.forEach(p => {
+      p.priceHistory.forEach(entry => {
+        const store = stores.find(s => s.id === entry.storeId)?.name || entry.storeId;
+        csvRows.push(`"${entry.date}","${store}",${entry.price}`);
+      });
+    });
+    const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${product.canonicalTitle.replace(/[^a-zA-Z0-9]/g, '_')}_PriceHistory.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    addToast('Price history exported to CSV!', 'success');
+  };
+
   const storeColors: Record<string, string> = {
     jumia: '#F68B1E', konga: '#E31837', amazon: '#FF9900', aliexpress: '#FF4747',
     jiji: '#1DB954', slot: '#0066CC', payportmall: '#7B2D8E', ebay: '#E53238',
@@ -117,44 +140,54 @@ const ProductDetailPage: React.FC = () => {
 
   const bestListing = sortedListings[0];
 
+  // AI Predictive Price Recommendation
+  const prediction = useMemo(() => {
+    return predictPriceTrajectory(
+      bestListing.price,
+      product.sourceProducts[0]?.priceHistory || [],
+      bestListing.discount || 0,
+      product.category
+    );
+  }, [bestListing, product]);
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-3 md:px-4 py-4 md:py-6">
+      <div className="max-w-7xl mx-auto px-2.5 sm:px-4 py-3 sm:py-6">
         {/* Breadcrumb */}
-        <nav className="flex items-center gap-1.5 text-xs md:text-sm text-gray-500 mb-4 flex-wrap">
+        <nav className="flex items-center gap-1 text-[11px] sm:text-xs text-gray-500 mb-3 flex-wrap">
           <Link to="/" className="hover:text-indigo-600">Home</Link><span>/</span>
           <Link to={`/search?category=${product.category}`} className="hover:text-indigo-600 capitalize">{product.category}</Link><span>/</span>
-          <span className="text-gray-900 font-medium truncate max-w-[150px] md:max-w-[300px]">{product.canonicalTitle}</span>
+          <span className="text-gray-900 font-medium truncate max-w-[140px] sm:max-w-[280px]">{product.canonicalTitle}</span>
         </nav>
 
         {/* Product Header */}
-        <div className="grid lg:grid-cols-2 gap-6 md:gap-8 mb-6 md:mb-8">
+        <div className="grid lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mb-4 sm:mb-6">
           {/* Image Gallery */}
-          <div className="bg-white rounded-2xl md:rounded-3xl border border-gray-100 overflow-hidden">
-            <div className="aspect-square relative">
-              <img src={product.images[selectedImage]} alt={product.canonicalTitle} className="w-full h-full object-cover" />
-              <div className="absolute top-3 left-3 flex flex-col gap-1.5">
-                {bestListing.discount > 10 && <span className="bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow">-{bestListing.discount}% OFF</span>}
-                {product.tags.includes('bestseller') && <span className="bg-yellow-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow">BESTSELLER</span>}
+          <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-100 overflow-hidden max-w-sm sm:max-w-md lg:max-w-none mx-auto w-full">
+            <div className="aspect-[4/3] sm:aspect-square relative max-h-[300px] sm:max-h-none">
+              <img src={product.images[selectedImage]} alt={product.canonicalTitle} className="w-full h-full object-contain p-2 sm:p-4" />
+              <div className="absolute top-2.5 left-2.5 flex flex-col gap-1">
+                {bestListing.discount > 10 && <span className="bg-red-500 text-white text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-full shadow">-{bestListing.discount}% OFF</span>}
+                {product.tags.includes('bestseller') && <span className="bg-yellow-500 text-white text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-full shadow">BESTSELLER</span>}
               </div>
-              <div className="absolute top-3 right-3 flex flex-col gap-2">
-                <button onClick={handleWatchlistToggle} className={`w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center shadow-lg transition-all ${inWatchlist ? 'bg-red-500 text-white' : 'bg-white text-gray-600 hover:bg-red-50 hover:text-red-500'}`}>
-                  <Heart size={16} fill={inWatchlist ? 'currentColor' : 'none'} />
+              <div className="absolute top-2.5 right-2.5 flex flex-col gap-1.5">
+                <button onClick={handleWatchlistToggle} className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center shadow-md transition-all ${inWatchlist ? 'bg-red-500 text-white' : 'bg-white text-gray-600 hover:bg-red-50 hover:text-red-500'}`}>
+                  <Heart size={14} fill={inWatchlist ? 'currentColor' : 'none'} />
                 </button>
-                <button onClick={handleShare} className="w-9 h-9 md:w-10 md:h-10 bg-white rounded-full flex items-center justify-center shadow-lg hover:bg-gray-50">
-                  {copied ? <Check size={16} className="text-green-500" /> : <Share2 size={16} className="text-gray-600" />}
+                <button onClick={handleShare} className="w-8 h-8 sm:w-9 sm:h-9 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-gray-50 text-gray-600">
+                  {copied ? <Check size={14} className="text-green-500" /> : <Share2 size={14} />}
                 </button>
               </div>
-              <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm rounded-full px-2.5 py-1 flex items-center gap-1.5 text-[10px] md:text-xs">
+              <div className="absolute bottom-2.5 left-2.5 bg-white/90 backdrop-blur-sm rounded-full px-2 py-0.5 flex items-center gap-1 text-[10px]">
                 <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
                 <span className="text-gray-700 font-medium">Verified {product.lastVerified}</span>
               </div>
             </div>
             {product.images.length > 1 && (
-              <div className="flex gap-2 p-3 md:p-4">
+              <div className="flex gap-1.5 p-2 sm:p-3 justify-center sm:justify-start border-t border-gray-50">
                 {product.images.map((img, i) => (
-                  <button key={i} onClick={() => setSelectedImage(i)} className={`w-14 h-14 md:w-16 md:h-16 rounded-lg md:rounded-xl overflow-hidden border-2 transition-all ${selectedImage === i ? 'border-indigo-500 ring-2 ring-indigo-200' : 'border-gray-200'}`}>
-                    <img src={img} alt="" className="w-full h-full object-cover" />
+                  <button key={i} onClick={() => setSelectedImage(i)} className={`w-11 h-11 sm:w-14 sm:h-14 rounded-lg overflow-hidden border-2 transition-all ${selectedImage === i ? 'border-indigo-500 ring-1 ring-indigo-200' : 'border-gray-200'}`}>
+                    <img src={img} alt="" className="w-full h-full object-contain p-0.5" />
                   </button>
                 ))}
               </div>
@@ -163,99 +196,145 @@ const ProductDetailPage: React.FC = () => {
 
           {/* Product Info */}
           <div>
-            <div className="mb-1.5 flex items-center gap-2 flex-wrap">
-              <span className="text-sm text-indigo-600 font-medium">{product.brand}</span>
-              <span className="text-xs text-gray-400">•</span>
-              <span className="text-xs text-gray-500"><Eye size={11} className="inline" /> {product.totalClicks.toLocaleString()} views</span>
-              <span className="hidden md:inline-flex items-center gap-1 text-[10px] text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
+            <div className="mb-1 flex items-center gap-2 flex-wrap">
+              <span className="text-xs sm:text-sm text-indigo-600 font-semibold">{product.brand}</span>
+              <span className="text-xs text-gray-300">•</span>
+              <span className="text-[11px] sm:text-xs text-gray-500"><Eye size={11} className="inline mr-0.5" /> {product.totalClicks.toLocaleString()} views</span>
+              <span className="hidden sm:inline-flex items-center gap-1 text-[10px] text-green-600 bg-green-50 px-1.5 py-0.5 rounded-full">
                 <Clock size={9} /> {detail.executionTimeMs}ms
               </span>
             </div>
-            <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 mb-2 md:mb-3">{product.canonicalTitle}</h1>
-            <p className="text-sm md:text-base text-gray-500 mb-4">{product.description}</p>
+            <h1 className="text-lg sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-1.5 leading-tight">{product.canonicalTitle}</h1>
+            <p className="text-xs sm:text-sm text-gray-500 mb-3 line-clamp-2">{product.description}</p>
 
-            <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6 flex-wrap">
+            <div className="flex items-center gap-2 mb-3 flex-wrap">
               <div className="flex items-center gap-0.5">
-                {[...Array(5)].map((_, i) => <Star key={i} size={16} className={i < Math.round(product.avgRating) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200'} />)}
+                {[...Array(5)].map((_, i) => <Star key={i} size={14} className={i < Math.round(product.avgRating) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200'} />)}
               </div>
-              <span className="font-semibold text-sm">{product.avgRating.toFixed(1)}</span>
-              <span className="text-xs text-gray-500">({product.totalReviews} reviews)</span>
-              <span className="text-xs text-green-600 font-medium">✓ {product.allListings.filter(l => l.inStock).length} stores</span>
+              <span className="font-semibold text-xs sm:text-sm">{product.avgRating.toFixed(1)}</span>
+              <span className="text-[11px] sm:text-xs text-gray-500">({product.totalReviews} reviews)</span>
+              <span className="text-[11px] sm:text-xs text-green-600 font-medium">✓ {product.allListings.filter(l => l.inStock).length} stores</span>
+            </div>
+
+            {/* AI Predictive Price Intelligence Card (PDF Core Requirement) */}
+            <div className={`border rounded-xl p-3 sm:p-3.5 mb-3 transition-all ${
+              prediction.recommendation === 'BUY_NOW'
+                ? 'bg-emerald-50/70 border-emerald-200'
+                : prediction.recommendation === 'WAIT'
+                ? 'bg-amber-50/70 border-amber-200'
+                : 'bg-indigo-50/70 border-indigo-200'
+            }`}>
+              <div className="flex items-center justify-between mb-1.5">
+                <div className="flex items-center gap-1.5">
+                  <Sparkles size={14} className={
+                    prediction.recommendation === 'BUY_NOW' ? 'text-emerald-700' : prediction.recommendation === 'WAIT' ? 'text-amber-700' : 'text-indigo-700'
+                  } />
+                  <span className="text-xs font-bold uppercase tracking-wider text-gray-900">
+                    Price Check • {prediction.recommendation === 'BUY_NOW' ? 'Great Time to Buy' : prediction.recommendation === 'WAIT' ? 'Price Likely to Drop' : 'Fair Price Right Now'}
+                  </span>
+                </div>
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                  prediction.recommendation === 'BUY_NOW' ? 'bg-emerald-600 text-white' : prediction.recommendation === 'WAIT' ? 'bg-amber-600 text-white' : 'bg-indigo-600 text-white'
+                }`}>
+                  {prediction.confidence}% Match
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-xs text-gray-700">
+                <p className="flex-1 pr-2 text-[11px] sm:text-xs font-medium">{prediction.rationale}</p>
+                <div className="text-right shrink-0">
+                  <p className="text-[10px] text-gray-500">Expected Best Price</p>
+                  <p className="text-xs font-bold text-gray-900 flex items-center justify-end">
+                    {prediction.expectedPriceChangePct < 0 ? (
+                      <ArrowDownRight size={13} className="text-green-600 inline" />
+                    ) : (
+                      <ArrowUpRight size={13} className="text-amber-500 inline" />
+                    )}
+                    {formatPrice(prediction.targetBuyPrice || bestListing.price * (1 + prediction.expectedPriceChangePct / 100), bestListing.currency)}
+                  </p>
+                </div>
+              </div>
             </div>
 
             {/* Best Price */}
-            <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl md:rounded-2xl p-4 md:p-5 mb-4 md:mb-6">
-              <div className="flex items-center gap-2 mb-1.5">
-                <TrendingDown size={16} className="text-green-600" />
-                <span className="text-xs md:text-sm font-semibold text-green-800">Lowest Total Price (incl. shipping)</span>
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-3 sm:p-4 mb-3 sm:mb-4">
+              <div className="flex items-center gap-1.5 mb-1">
+                <TrendingDown size={14} className="text-green-600" />
+                <span className="text-xs font-semibold text-green-800">Lowest Total Price (incl. shipping)</span>
               </div>
-              <div className="flex items-end gap-2 md:gap-3">
-                <span className="text-2xl md:text-3xl font-bold text-gray-900">{formatPrice(calculateTotalPrice(bestListing), bestListing.currency)}</span>
+              <div className="flex items-end gap-2">
+                <span className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">{formatPrice(calculateTotalPrice(bestListing), bestListing.currency)}</span>
                 {bestListing.originalPrice > bestListing.price && (
-                  <span className="text-sm md:text-base text-gray-400 line-through mb-0.5">{formatPrice(bestListing.originalPrice, bestListing.currency)}</span>
+                  <span className="text-xs sm:text-sm text-gray-400 line-through mb-0.5">{formatPrice(bestListing.originalPrice, bestListing.currency)}</span>
                 )}
               </div>
-              <p className="text-xs md:text-sm text-green-700 mt-1.5">
+              <p className="text-xs text-green-700 mt-1">
                 at <strong>{bestListing.store.name}</strong> {bestListing.store.logo} • Delivered by {bestListing.deliveryDate}
                 {bestListing.shippingCost === 0 && ' • Free shipping'}
               </p>
               <button
                 onClick={() => handleAffiliateClick(bestListing)}
                 disabled={redirecting === bestListing.store.id}
-                className="mt-3 w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold py-2.5 md:py-3 rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2 text-sm md:text-base disabled:opacity-70"
+                className="mt-2.5 w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold py-2 sm:py-2.5 rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-1.5 text-xs sm:text-sm disabled:opacity-70"
               >
-                {redirecting === bestListing.store.id ? <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> Redirecting...</> : <>Buy at Best Price <ExternalLink size={15} /></>}
+                {redirecting === bestListing.store.id ? <><span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> Redirecting...</> : <>Buy at Best Price <ExternalLink size={13} /></>}
               </button>
             </div>
 
             {/* Summary Tags */}
-            <div className="grid grid-cols-3 gap-2 mb-4">
+            <div className="grid grid-cols-3 gap-1.5 sm:gap-2 mb-3">
               {summaryTags.cheapest && (
-                <div className="bg-green-50 border border-green-200 rounded-lg p-2 text-center">
-                  <Tag size={14} className="text-green-600 mx-auto mb-0.5" />
-                  <p className="text-[10px] text-green-700 font-medium">Cheapest</p>
-                  <p className="text-[9px] text-green-600">{summaryTags.cheapest}</p>
+                <div className="bg-green-50 border border-green-200 rounded-lg p-1.5 text-center">
+                  <Tag size={12} className="text-green-600 mx-auto mb-0.5" />
+                  <p className="text-[10px] text-green-700 font-bold">Cheapest</p>
+                  <p className="text-[9px] text-green-600 truncate">{summaryTags.cheapest}</p>
                 </div>
               )}
               {summaryTags.fastest && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 text-center">
-                  <Timer size={14} className="text-blue-600 mx-auto mb-0.5" />
-                  <p className="text-[10px] text-blue-700 font-medium">Fastest</p>
-                  <p className="text-[9px] text-blue-600">{summaryTags.fastest}</p>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-1.5 text-center">
+                  <Timer size={12} className="text-blue-600 mx-auto mb-0.5" />
+                  <p className="text-[10px] text-blue-700 font-bold">Fastest</p>
+                  <p className="text-[9px] text-blue-600 truncate">{summaryTags.fastest}</p>
                 </div>
               )}
               {summaryTags.topRated && (
-                <div className="bg-purple-50 border border-purple-200 rounded-lg p-2 text-center">
-                  <Award size={14} className="text-purple-600 mx-auto mb-0.5" />
-                  <p className="text-[10px] text-purple-700 font-medium">Top Rated</p>
-                  <p className="text-[9px] text-purple-600">{summaryTags.topRated}</p>
+                <div className="bg-purple-50 border border-purple-200 rounded-lg p-1.5 text-center">
+                  <Award size={12} className="text-purple-600 mx-auto mb-0.5" />
+                  <p className="text-[10px] text-purple-700 font-bold">Top Rated</p>
+                  <p className="text-[9px] text-purple-600 truncate">{summaryTags.topRated}</p>
                 </div>
               )}
             </div>
 
-            {/* Quick Actions */}
-            <div className="grid grid-cols-4 gap-2 md:gap-3 mb-4 md:mb-6">
-              <button onClick={() => { if (!isAuthenticated) { addToast('Please sign in', 'warning'); navigate('/login'); return; } setShowAlertModal(true); }} className="flex flex-col items-center gap-0.5 md:gap-1 p-2 md:p-3 bg-white border border-gray-200 rounded-xl hover:border-indigo-300 transition-all">
-                <Bell size={18} className="text-indigo-600" /><span className="text-[9px] md:text-[10px] font-medium text-gray-700">Alert</span>
+            {/* Quick Actions (with Collaborative Lists & Compare) */}
+            <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5 sm:gap-2 mb-3">
+              <button onClick={() => { if (!isAuthenticated) { addToast('Please sign in', 'warning'); navigate('/login'); return; } setShowAlertModal(true); }} className="flex flex-col items-center gap-0.5 p-2 bg-white border border-gray-200 rounded-lg hover:border-indigo-300 transition-all">
+                <Bell size={15} className="text-indigo-600" /><span className="text-[10px] font-medium text-gray-700">Alert</span>
               </button>
-              <button onClick={() => setActiveTab('history')} className="flex flex-col items-center gap-0.5 md:gap-1 p-2 md:p-3 bg-white border border-gray-200 rounded-xl hover:border-indigo-300 transition-all">
-                <BarChart3 size={18} className="text-indigo-600" /><span className="text-[9px] md:text-[10px] font-medium text-gray-700">History</span>
+              <button onClick={() => setActiveTab('history')} className="flex flex-col items-center gap-0.5 p-2 bg-white border border-gray-200 rounded-lg hover:border-indigo-300 transition-all">
+                <BarChart3 size={15} className="text-indigo-600" /><span className="text-[10px] font-medium text-gray-700">History</span>
               </button>
-              <button onClick={handleShare} className="flex flex-col items-center gap-0.5 md:gap-1 p-2 md:p-3 bg-white border border-gray-200 rounded-xl hover:border-indigo-300 transition-all">
-                {copied ? <Check size={18} className="text-green-600" /> : <Share2 size={18} className="text-indigo-600" />}
-                <span className="text-[9px] md:text-[10px] font-medium text-gray-700">{copied ? 'Copied' : 'Share'}</span>
+              <button onClick={() => navigate(`/compare?ids=${productId}`)} className="flex flex-col items-center gap-0.5 p-2 bg-white border border-gray-200 rounded-lg hover:border-indigo-300 transition-all">
+                <Scale size={15} className="text-indigo-600" /><span className="text-[10px] font-medium text-gray-700">Compare</span>
               </button>
-              <button onClick={handleWatchlistToggle} className="flex flex-col items-center gap-0.5 md:gap-1 p-2 md:p-3 bg-white border border-gray-200 rounded-xl hover:border-indigo-300 transition-all">
-                <Heart size={18} className={inWatchlist ? 'text-red-500' : 'text-indigo-600'} fill={inWatchlist ? 'currentColor' : 'none'} />
-                <span className="text-[9px] md:text-[10px] font-medium text-gray-700">{inWatchlist ? 'Saved' : 'Save'}</span>
+              <button onClick={() => setShowCollabModal(true)} className="flex flex-col items-center gap-0.5 p-2 bg-white border border-gray-200 rounded-lg hover:border-indigo-300 transition-all">
+                <Users size={15} className="text-purple-600" /><span className="text-[10px] font-medium text-gray-700">Shared List</span>
+              </button>
+              <button onClick={handleShare} className="flex flex-col items-center gap-0.5 p-2 bg-white border border-gray-200 rounded-lg hover:border-indigo-300 transition-all">
+                {copied ? <Check size={15} className="text-green-600" /> : <Share2 size={15} className="text-indigo-600" />}
+                <span className="text-[10px] font-medium text-gray-700">{copied ? 'Copied' : 'Share'}</span>
+              </button>
+              <button onClick={handleWatchlistToggle} className="flex flex-col items-center gap-0.5 p-2 bg-white border border-gray-200 rounded-lg hover:border-indigo-300 transition-all">
+                <Heart size={15} className={inWatchlist ? 'text-red-500' : 'text-indigo-600'} fill={inWatchlist ? 'currentColor' : 'none'} />
+                <span className="text-[10px] font-medium text-gray-700">{inWatchlist ? 'Saved' : 'Save'}</span>
               </button>
             </div>
 
-            <div className="grid grid-cols-2 gap-2 text-xs md:text-sm text-gray-600">
-              <div className="flex items-center gap-1.5"><Truck size={14} className="text-indigo-500 shrink-0" /><span>Free delivery available</span></div>
-              <div className="flex items-center gap-1.5"><Shield size={14} className="text-indigo-500 shrink-0" /><span>Buyer protection</span></div>
-              <div className="flex items-center gap-1.5"><Clock size={14} className="text-indigo-500 shrink-0" /><span>Updated every 15min</span></div>
-              <div className="flex items-center gap-1.5"><Check size={14} className="text-green-500 shrink-0" /><span>Verified sellers</span></div>
+
+            <div className="grid grid-cols-2 gap-1.5 text-[11px] sm:text-xs text-gray-600">
+              <div className="flex items-center gap-1.5"><Truck size={13} className="text-indigo-500 shrink-0" /><span>Free delivery available</span></div>
+              <div className="flex items-center gap-1.5"><Shield size={13} className="text-indigo-500 shrink-0" /><span>Buyer protection</span></div>
+              <div className="flex items-center gap-1.5"><Clock size={13} className="text-indigo-500 shrink-0" /><span>Updated every 15min</span></div>
+              <div className="flex items-center gap-1.5"><Check size={13} className="text-green-500 shrink-0" /><span>Verified sellers</span></div>
             </div>
           </div>
         </div>
@@ -442,10 +521,19 @@ const ProductDetailPage: React.FC = () => {
                     <h3 className="text-base md:text-lg font-bold text-gray-900">Price History</h3>
                     <p className="text-xs text-gray-500">Track price changes across stores</p>
                   </div>
-                  <div className="flex gap-1.5">
-                    {([30, 90, 180] as const).map(r => (
-                      <button key={r} onClick={() => setHistoryRange(r)} className={`px-3 py-1.5 rounded-full text-xs font-medium ${historyRange === r ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600'}`}>{r}d</button>
-                    ))}
+                  <div className="flex items-center gap-2">
+                    <div className="flex gap-1.5">
+                      {([30, 90, 180] as const).map(r => (
+                        <button key={r} onClick={() => setHistoryRange(r)} className={`px-3 py-1.5 rounded-full text-xs font-medium ${historyRange === r ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600'}`}>{r}d</button>
+                      ))}
+                    </div>
+                    <button
+                      onClick={handleExportCSV}
+                      className="px-3 py-1.5 rounded-full text-xs font-semibold bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center gap-1 transition-colors"
+                      title="Download Price History as CSV spreadsheet"
+                    >
+                      <Download size={13} /> Export CSV
+                    </button>
                   </div>
                 </div>
                 {chartData.length > 0 ? (
@@ -549,8 +637,16 @@ const ProductDetailPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Collaborative Shopping List Modal */}
+      <CollaborativeListModal
+        isOpen={showCollabModal}
+        onClose={() => setShowCollabModal(false)}
+        initialProductId={productId}
+      />
     </div>
   );
 };
 
 export default ProductDetailPage;
+

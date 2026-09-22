@@ -1,40 +1,27 @@
 /**
- * PHASE 3 - INGESTION: Real Jumia Scraper
+ * PHASE 3 - INGESTION: Direct Registered Seller Stores Scraper
  * 
- * Production-ready scraper for Jumia Nigeria with real DOM parsing, 
- * live price extraction, and real availability verification.
+ * Ingests products listed by direct verified merchants on the PriceWise platform.
  */
 
 import { BaseScraper, ScrapedProduct, ScrapeResult } from './BaseScraper';
 import { ScraperOptions } from '../config/scraperConfig';
 import { RealLiveScraper } from '../../services/realLiveScraper';
 
-export class JumiaScraper extends BaseScraper {
+export class SellerStoreScraper extends BaseScraper {
   constructor() {
-    super('jumia');
+    super('apex_electronics');
   }
 
-  /**
-   * Scrape a real Jumia product page or search URL
-   */
   protected async scrapePage(url: string, options: ScraperOptions): Promise<ScrapedProduct[]> {
-    console.log(`[JumiaScraper] Initiating real live scrape for: ${url}`);
-    const results = await RealLiveScraper.scrapeJumia(url);
-    if (results.length === 0) {
-      // If URL was a specific item, attempt arbitrary live schema extraction
-      const single = await RealLiveScraper.scrapeArbitraryUrl(url);
-      return [single];
-    }
-    return results;
+    console.log(`[SellerStoreScraper] Ingesting registered merchant inventory for: ${url}`);
+    return await RealLiveScraper.scrapeRegisteredSellerStores(url);
   }
 
-  /**
-   * Scrape live category or search query from Jumia
-   */
   async scrapeCategory(category: string, maxProducts: number = 10): Promise<ScrapeResult> {
     const startTime = Date.now();
     try {
-      const products = await RealLiveScraper.scrapeJumia(category);
+      const products = await RealLiveScraper.scrapeRegisteredSellerStores(category);
       return {
         success: products.length > 0,
         products: products.slice(0, maxProducts),
