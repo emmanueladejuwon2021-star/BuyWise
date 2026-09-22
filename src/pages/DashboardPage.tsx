@@ -44,57 +44,57 @@ const DashboardPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-8">
         {/* Dashboard Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-2xl flex items-center justify-center text-white text-xl font-bold">
+        <div className="mb-4 sm:mb-8">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-xl sm:rounded-2xl flex items-center justify-center text-white text-base sm:text-xl font-bold shrink-0">
               {user.name.charAt(0).toUpperCase()}
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Welcome back, {user.name}!</h1>
-              <p className="text-sm text-gray-500">Manage your watchlist, alerts, and preferences</p>
+              <h1 className="text-lg sm:text-2xl font-bold text-gray-900 leading-tight">Welcome back, {user.name}!</h1>
+              <p className="text-xs sm:text-sm text-gray-500">Manage your watchlist, alerts, and preferences</p>
             </div>
           </div>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white rounded-2xl border border-gray-100 p-5">
-            <Heart size={20} className="text-red-500 mb-2" />
-            <p className="text-2xl font-bold text-gray-900">{user.watchlist.length}</p>
-            <p className="text-xs text-gray-500">Items Watched</p>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4 mb-4 sm:mb-8">
+          <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-100 p-3 sm:p-5">
+            <Heart size={16} className="text-red-500 mb-1 sm:mb-2" />
+            <p className="text-lg sm:text-2xl font-bold text-gray-900">{user.watchlist.length}</p>
+            <p className="text-[10px] sm:text-xs text-gray-500">Items Watched</p>
           </div>
-          <div className="bg-white rounded-2xl border border-gray-100 p-5">
-            <Bell size={20} className="text-indigo-500 mb-2" />
-            <p className="text-2xl font-bold text-gray-900">{user.priceAlerts.length}</p>
-            <p className="text-xs text-gray-500">Active Alerts</p>
+          <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-100 p-3 sm:p-5">
+            <Bell size={16} className="text-indigo-500 mb-1 sm:mb-2" />
+            <p className="text-lg sm:text-2xl font-bold text-gray-900">{user.priceAlerts.length}</p>
+            <p className="text-[10px] sm:text-xs text-gray-500">Active Alerts</p>
           </div>
-          <div className="bg-white rounded-2xl border border-gray-100 p-5">
-            <Clock size={20} className="text-green-500 mb-2" />
-            <p className="text-2xl font-bold text-gray-900">{user.clickHistory.length}</p>
-            <p className="text-xs text-gray-500">Stores Visited</p>
+          <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-100 p-3 sm:p-5">
+            <Clock size={16} className="text-green-500 mb-1 sm:mb-2" />
+            <p className="text-lg sm:text-2xl font-bold text-gray-900">{user.clickHistory.length}</p>
+            <p className="text-[10px] sm:text-xs text-gray-500">Stores Visited</p>
           </div>
-          <div className="bg-white rounded-2xl border border-gray-100 p-5">
-            <TrendingDown size={20} className="text-purple-500 mb-2" />
-            <p className="text-2xl font-bold text-gray-900">₦{(user.clickHistory.length * 15000).toLocaleString()}</p>
-            <p className="text-xs text-gray-500">Estimated Savings</p>
+          <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-100 p-3 sm:p-5">
+            <TrendingDown size={16} className="text-purple-500 mb-1 sm:mb-2" />
+            <p className="text-lg sm:text-2xl font-bold text-gray-900">₦{(user.clickHistory.length * 15000).toLocaleString()}</p>
+            <p className="text-[10px] sm:text-xs text-gray-500">Estimated Savings</p>
           </div>
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+        <div className="flex gap-1.5 sm:gap-2 mb-4 sm:mb-6 overflow-x-auto pb-1 scrollbar-none">
           {sections.map(section => (
             <button
               key={section.key}
               onClick={() => setActiveSection(section.key as typeof activeSection)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-all ${
                 activeSection === section.key
-                  ? 'bg-indigo-600 text-white shadow-md'
+                  ? 'bg-indigo-600 text-white shadow-sm'
                   : 'bg-white text-gray-600 border border-gray-200 hover:border-indigo-300'
               }`}
             >
-              <section.icon size={16} />
+              <section.icon size={14} />
               {section.label}
             </button>
           ))}
@@ -102,29 +102,29 @@ const DashboardPage: React.FC = () => {
 
         {/* Overview Section */}
         {activeSection === 'overview' && (
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* Recent Watchlist Items */}
-            <div className="bg-white rounded-2xl border border-gray-100 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold text-gray-900">Recently Watched</h3>
-                <button onClick={() => setActiveSection('watchlist')} className="text-sm text-indigo-600 font-medium flex items-center gap-1">
-                  View All <ChevronRight size={14} />
+            <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-100 p-3.5 sm:p-6">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <h3 className="text-sm sm:text-base font-bold text-gray-900">Recently Watched</h3>
+                <button onClick={() => setActiveSection('watchlist')} className="text-xs sm:text-sm text-indigo-600 font-medium flex items-center gap-0.5">
+                  View All <ChevronRight size={13} />
                 </button>
               </div>
               {watchlistProducts.length === 0 ? (
-                <p className="text-sm text-gray-500">No items in your watchlist yet. <Link to="/" className="text-indigo-600 hover:underline">Browse products</Link></p>
+                <p className="text-xs sm:text-sm text-gray-500">No items in your watchlist yet. <Link to="/" className="text-indigo-600 hover:underline">Browse products</Link></p>
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-2 sm:space-y-3">
                   {watchlistProducts.slice(0, 3).map(product => {
                     const { listing } = getBestDeal(product);
                     return (
-                      <Link key={product.id} to={`/product/${product.id}`} className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 transition-colors">
-                        <img src={product.images[0]} alt={product.name} className="w-14 h-14 rounded-xl object-cover" />
+                      <Link key={product.id} to={`/product/${product.id}`} className="flex items-center gap-3 p-2 sm:p-3 rounded-lg sm:rounded-xl hover:bg-gray-50 transition-colors">
+                        <img src={product.images[0]} alt={product.name} className="w-11 h-11 sm:w-14 sm:h-14 rounded-lg object-cover shrink-0" />
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 truncate">{product.name}</p>
-                          <p className="text-xs text-gray-500">Best: {formatPrice(listing.price, listing.currency)} at {listing.store.name}</p>
+                          <p className="text-xs sm:text-sm font-medium text-gray-900 truncate">{product.name}</p>
+                          <p className="text-[10px] sm:text-xs text-gray-500">Best: {formatPrice(listing.price, listing.currency)} at {listing.store.name}</p>
                         </div>
-                        <ChevronRight size={16} className="text-gray-400 shrink-0" />
+                        <ChevronRight size={14} className="text-gray-400 shrink-0" />
                       </Link>
                     );
                   })}
@@ -133,23 +133,23 @@ const DashboardPage: React.FC = () => {
             </div>
 
             {/* Recent Click History */}
-            <div className="bg-white rounded-2xl border border-gray-100 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold text-gray-900">Recent Store Visits</h3>
-                <button onClick={() => setActiveSection('history')} className="text-sm text-indigo-600 font-medium flex items-center gap-1">
-                  View All <ChevronRight size={14} />
+            <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-100 p-3.5 sm:p-6">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <h3 className="text-sm sm:text-base font-bold text-gray-900">Recent Store Visits</h3>
+                <button onClick={() => setActiveSection('history')} className="text-xs sm:text-sm text-indigo-600 font-medium flex items-center gap-0.5">
+                  View All <ChevronRight size={13} />
                 </button>
               </div>
               {user.clickHistory.length === 0 ? (
-                <p className="text-sm text-gray-500">No store visits yet. Click "Buy Now" on any product to start tracking.</p>
+                <p className="text-xs sm:text-sm text-gray-500">No store visits yet. Click "Buy Now" on any product to start tracking.</p>
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {user.clickHistory.slice(0, 3).map(log => (
-                    <div key={log.id} className="flex items-center gap-4 p-3 rounded-xl bg-gray-50">
-                      <ExternalLink size={16} className="text-indigo-500 shrink-0" />
+                    <div key={log.id} className="flex items-center gap-3 p-2 sm:p-3 rounded-lg sm:rounded-xl bg-gray-50">
+                      <ExternalLink size={14} className="text-indigo-500 shrink-0" />
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">{log.productName}</p>
-                        <p className="text-xs text-gray-500">→ {log.storeName} • {formatPrice(log.price, log.currency)} • {new Date(log.timestamp).toLocaleDateString()}</p>
+                        <p className="text-xs sm:text-sm font-medium text-gray-900 truncate">{log.productName}</p>
+                        <p className="text-[10px] sm:text-xs text-gray-500">→ {log.storeName} • {formatPrice(log.price, log.currency)} • {new Date(log.timestamp).toLocaleDateString()}</p>
                       </div>
                     </div>
                   ))}
@@ -161,46 +161,46 @@ const DashboardPage: React.FC = () => {
 
         {/* Watchlist Section */}
         {activeSection === 'watchlist' && (
-          <div className="bg-white rounded-2xl border border-gray-100 p-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">My Watchlist ({watchlistProducts.length} items)</h3>
+          <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-100 p-3.5 sm:p-6">
+            <h3 className="text-sm sm:text-base font-bold text-gray-900 mb-3 sm:mb-4">My Watchlist ({watchlistProducts.length} items)</h3>
             {watchlistProducts.length === 0 ? (
-              <div className="text-center py-12">
-                <Heart size={48} className="mx-auto text-gray-300 mb-4" />
-                <p className="text-gray-500 mb-4">Your watchlist is empty</p>
-                <Link to="/" className="px-6 py-2 bg-indigo-600 text-white rounded-full text-sm font-medium">Browse Products</Link>
+              <div className="text-center py-8 sm:py-12">
+                <Heart size={36} className="mx-auto text-gray-300 mb-2" />
+                <p className="text-xs sm:text-sm text-gray-500 mb-3">Your watchlist is empty</p>
+                <Link to="/" className="px-4 py-2 bg-indigo-600 text-white rounded-full text-xs sm:text-sm font-medium">Browse Products</Link>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-2.5 sm:space-y-3">
                 {watchlistProducts.map(product => {
                   const { listing, savings } = getBestDeal(product);
                   return (
-                    <div key={product.id} className="flex flex-col sm:flex-row gap-4 p-4 border border-gray-100 rounded-xl hover:shadow-sm transition-all">
+                    <div key={product.id} className="flex flex-row gap-3 p-2.5 sm:p-4 border border-gray-100 rounded-xl hover:shadow-sm transition-all">
                       <Link to={`/product/${product.id}`} className="shrink-0">
-                        <img src={product.images[0]} alt={product.name} className="w-full sm:w-24 h-24 object-cover rounded-xl" />
+                        <img src={product.images[0]} alt={product.name} className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg" />
                       </Link>
-                      <div className="flex-1">
-                        <Link to={`/product/${product.id}`} className="font-semibold text-gray-900 hover:text-indigo-600 transition-colors">
+                      <div className="flex-1 min-w-0">
+                        <Link to={`/product/${product.id}`} className="font-semibold text-gray-900 text-xs sm:text-sm hover:text-indigo-600 transition-colors line-clamp-1">
                           {product.name}
                         </Link>
-                        <p className="text-sm text-gray-500 mt-1">
+                        <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5 truncate">
                           Best: <strong className="text-green-600">{formatPrice(listing.totalCost, listing.currency)}</strong> at {listing.store.name}
-                          {listing.shippingCost === 0 && ' (free shipping)'}
+                          {listing.shippingCost === 0 && ' (free ship)'}
                         </p>
                         {savings > 0 && (
-                          <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
-                            <TrendingDown size={12} /> Save up to {formatPrice(savings, listing.currency)} across stores
+                          <p className="text-[10px] sm:text-xs text-green-600 mt-0.5 flex items-center gap-1">
+                            <TrendingDown size={11} /> Save up to {formatPrice(savings, listing.currency)}
                           </p>
                         )}
-                        <div className="flex items-center gap-2 mt-3">
-                          <Link to={`/product/${product.id}`} className="px-3 py-1.5 bg-indigo-600 text-white text-xs font-medium rounded-lg hover:bg-indigo-700">
-                            Compare Prices
+                        <div className="flex items-center gap-2 mt-2">
+                          <Link to={`/product/${product.id}`} className="px-2.5 py-1 bg-indigo-600 text-white text-[11px] sm:text-xs font-medium rounded-lg hover:bg-indigo-700">
+                            Compare
                           </Link>
                           <button
                             onClick={() => { removeFromWatchlist(product.id); addToast('Removed from watchlist', 'info'); }}
-                            className="p-1.5 text-gray-400 hover:text-red-500 rounded-lg hover:bg-red-50 transition-colors"
+                            className="p-1 text-gray-400 hover:text-red-500 rounded-md hover:bg-red-50 transition-colors"
                             title="Remove from watchlist"
                           >
-                            <Trash2 size={14} />
+                            <Trash2 size={13} />
                           </button>
                         </div>
                       </div>

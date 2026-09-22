@@ -31,32 +31,32 @@ const DealsPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Flash Deals Banner */}
-      <section className="bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 py-8">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
-                <Flame size={28} className="text-white" />
+      <section className="bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 py-4 sm:py-6">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-6">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                <Flame size={22} className="text-white" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-white">Flash Deals</h1>
-                <p className="text-white/80 text-sm">Massive discounts ending soon!</p>
+                <h1 className="text-xl sm:text-2xl font-bold text-white leading-tight">Flash Deals</h1>
+                <p className="text-white/80 text-xs sm:text-sm">Massive discounts ending soon!</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <span className="text-white/80 text-sm font-medium">Ends in:</span>
-              <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <span className="text-white/80 text-xs sm:text-sm font-medium">Ends in:</span>
+              <div className="flex items-center gap-1 sm:gap-1.5">
                 {[
                   { value: timeLeft.hours, label: 'HRS' },
                   { value: timeLeft.minutes, label: 'MIN' },
                   { value: timeLeft.seconds, label: 'SEC' },
                 ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-2">
-                    <div className="bg-white/20 backdrop-blur-sm rounded-xl px-3 py-2 text-center min-w-[52px]">
-                      <span className="text-xl font-bold text-white">{String(item.value).padStart(2, '0')}</span>
-                      <p className="text-[10px] text-white/70">{item.label}</p>
+                  <div key={i} className="flex items-center gap-1">
+                    <div className="bg-white/20 backdrop-blur-sm rounded-lg px-2 py-1 text-center min-w-[42px] sm:min-w-[48px]">
+                      <span className="text-sm sm:text-base font-bold text-white">{String(item.value).padStart(2, '0')}</span>
+                      <p className="text-[8px] sm:text-[9px] text-white/70">{item.label}</p>
                     </div>
-                    {i < 2 && <span className="text-white text-xl font-bold">:</span>}
+                    {i < 2 && <span className="text-white text-sm sm:text-base font-bold">:</span>}
                   </div>
                 ))}
               </div>
@@ -65,22 +65,22 @@ const DealsPage: React.FC = () => {
         </div>
       </section>
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
         {/* Flash Deals */}
         {flashDeals.length > 0 && (
-          <section className="mb-12">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center">
-                  <Zap size={20} className="text-red-500" />
+          <section className="mb-6 sm:mb-8">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 bg-red-100 rounded-lg flex items-center justify-center">
+                  <Zap size={16} className="text-red-500" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900">Mega Flash Deals</h2>
-                  <p className="text-sm text-gray-500">15%+ off — Don't miss out!</p>
+                  <h2 className="text-base sm:text-lg font-bold text-gray-900 leading-tight">Mega Flash Deals</h2>
+                  <p className="text-[11px] sm:text-xs text-gray-500">15%+ off — Don't miss out!</p>
                 </div>
               </div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-4">
               {flashDeals.map(({ product }) => (
                 <ProductCard key={product.id} product={product} />
               ))}
@@ -89,53 +89,53 @@ const DealsPage: React.FC = () => {
         )}
 
         {/* Best Discounts */}
-        <section className="mb-12">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-                <TrendingDown size={20} className="text-green-600" />
+        <section className="mb-6 sm:mb-8">
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                <TrendingDown size={16} className="text-green-600" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-gray-900">Biggest Discounts</h2>
-                <p className="text-sm text-gray-500">Top savings across all stores</p>
+                <h2 className="text-base sm:text-lg font-bold text-gray-900 leading-tight">Biggest Discounts</h2>
+                <p className="text-[11px] sm:text-xs text-gray-500">Top savings across all stores</p>
               </div>
             </div>
           </div>
-          <div className="space-y-4">
+          <div className="space-y-2.5 sm:space-y-3">
             {bestDiscounts.map(({ product, listing, savings }) => (
               <Link
                 key={product.id}
                 to={`/product/${product.id}`}
-                className="block bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-lg hover:border-green-200 transition-all"
+                className="block bg-white rounded-xl sm:rounded-2xl border border-gray-100 p-2.5 sm:p-4 hover:shadow-md hover:border-green-200 transition-all"
               >
-                <div className="flex flex-col sm:flex-row gap-5">
-                  <img src={product.images[0]} alt={product.name} className="w-full sm:w-32 h-32 object-cover rounded-xl" />
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <p className="text-xs text-indigo-600 font-medium">{product.brand}</p>
-                        <h3 className="font-semibold text-gray-900 mt-1">{product.name}</h3>
-                        <p className="text-sm text-gray-500 mt-1">
-                          Best price at <strong>{listing.store.name}</strong> {listing.store.logo}
-                        </p>
-                      </div>
-                      <div className="text-right shrink-0">
-                        <span className="bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full">
+                <div className="flex flex-row gap-3 sm:gap-4">
+                  <img src={product.images[0]} alt={product.name} className="w-20 h-20 sm:w-28 sm:h-28 object-cover rounded-lg sm:rounded-xl shrink-0" />
+                  <div className="flex-1 min-w-0 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="text-[10px] sm:text-xs text-indigo-600 font-medium truncate">{product.brand}</p>
+                          <h3 className="font-semibold text-gray-900 text-xs sm:text-sm line-clamp-1">{product.name}</h3>
+                          <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5 truncate">
+                            Best at <strong>{listing.store.name}</strong> {listing.store.logo}
+                          </p>
+                        </div>
+                        <span className="bg-red-500 text-white text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-full shrink-0">
                           -{listing.discount}%
                         </span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-4 mt-3">
+                    <div className="flex items-center gap-2 sm:gap-3 pt-1 border-t border-gray-50 flex-wrap">
                       <div>
-                        <span className="text-xl font-bold text-gray-900">
+                        <span className="text-xs sm:text-base font-bold text-gray-900">
                           {listing.currency === '₦' ? `₦${listing.price.toLocaleString()}` : `$${listing.price.toLocaleString()}`}
                         </span>
-                        <span className="text-sm text-gray-400 line-through ml-2">
+                        <span className="text-[10px] sm:text-xs text-gray-400 line-through ml-1.5">
                           {listing.currency === '₦' ? `₦${listing.originalPrice.toLocaleString()}` : `$${listing.originalPrice.toLocaleString()}`}
                         </span>
                       </div>
-                      <span className="text-sm text-green-600 font-medium flex items-center gap-1">
-                        <TrendingDown size={14} />
+                      <span className="text-[10px] sm:text-xs text-green-600 font-medium flex items-center gap-0.5 ml-auto">
+                        <TrendingDown size={11} />
                         Save {listing.currency === '₦' ? `₦${(listing.originalPrice - listing.price).toLocaleString()}` : `$${(listing.originalPrice - listing.price).toLocaleString()}`}
                       </span>
                     </div>
@@ -148,19 +148,19 @@ const DealsPage: React.FC = () => {
 
         {/* Savings Tips */}
         <section>
-          <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-3xl p-8 border border-indigo-100">
-            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+          <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl p-4 sm:p-6 border border-indigo-100">
+            <h2 className="text-base sm:text-lg font-bold text-gray-900 mb-3 flex items-center gap-1.5">
               💡 Smart Shopping Tips
             </h2>
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-3 gap-3 sm:gap-4">
               {[
                 { title: 'Compare Before You Buy', desc: 'Always check at least 3 stores before purchasing. The same product can vary by 20-30% in price.' },
                 { title: 'Watch for Flash Sales', desc: 'Stores like Jumia and Konga have weekly flash sales. Set price alerts to catch them.' },
                 { title: 'Factor in Shipping', desc: 'A lower product price might have higher shipping. Always check the total cost including delivery.' },
               ].map((tip, i) => (
-                <div key={i} className="bg-white rounded-2xl p-5 border border-gray-100">
-                  <h3 className="font-semibold text-gray-900 mb-2">{tip.title}</h3>
-                  <p className="text-sm text-gray-500">{tip.desc}</p>
+                <div key={i} className="bg-white rounded-xl p-3 sm:p-4 border border-gray-100">
+                  <h3 className="font-semibold text-gray-900 text-xs sm:text-sm mb-1">{tip.title}</h3>
+                  <p className="text-[11px] sm:text-xs text-gray-500 leading-relaxed">{tip.desc}</p>
                 </div>
               ))}
             </div>

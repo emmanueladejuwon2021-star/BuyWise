@@ -1,12 +1,17 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Mail, Lock, Eye, EyeOff, Store, ShoppingBag, ArrowRight } from 'lucide-react';
+import { useAuth, isPlatformOwnerEmail } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { UserRole } from '../types';
 
 const LoginPage: React.FC = () => {
+  const [searchParams] = useSearchParams();
+  const initialRole = searchParams.get('type') === 'seller' ? 'seller' : 'buyer';
+  const [role, setRole] = useState<UserRole>(initialRole);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [storeName, setStoreName] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
@@ -15,59 +20,115 @@ const LoginPage: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) {
-      addToast('Please fill in all fields', 'warning');
+    if (!email) {
+      addToast('Please enter your email address', 'warning');
       return;
     }
     setLoading(true);
     setTimeout(() => {
-      login(email, password);
+      login(email, password, role, role === 'seller' ? (storeName || email.split('@')[0] + ' Store') : undefined);
       setLoading(false);
-      addToast('Welcome back! You are now signed in.', 'success');
-      navigate('/');
-    }, 1000);
+      
+      if (role === 'seller') {
+        addToast('Welcome back to your Merchant Portal!', 'success');
+        navigate('/store/dashboard');
+      } else {
+        addToast('Welcome back! You are now signed in.', 'success');
+        navigate('/');
+      }
+    }, 450);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center px-3 sm:px-4 py-6 sm:py-10">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="w-12 h-12 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center">
-              <span className="text-white font-bold text-xl">P</span>
+        <div className="text-center mb-5">
+          <Link to="/" className="inline-flex items-center gap-2 mb-3">
+            <div className="w-9 h-9 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
+              <span className="text-white font-bold text-lg">P</span>
             </div>
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900">Welcome back</h1>
-          <p className="text-gray-500 mt-1">Sign in to track prices and save more</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+            {role === 'seller' ? 'Merchant Portal Sign In' : 'Welcome back'}
+          </h1>
+          <p className="text-xs text-gray-500 mt-1">
+            {role === 'seller' 
+              ? 'Manage your store listings, campaigns, and click analytics' 
+              : 'Sign in to track prices, watch items, and save more'}
+          </p>
         </div>
 
-        <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-8">
-          <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Account Role Tabs */}
+        <div className="flex bg-gray-100 p-1 rounded-xl mb-4 text-xs font-semibold">
+          <button
+            type="button"
+            onClick={() => setRole('buyer')}
+            className={`flex-1 py-2 rounded-lg flex items-center justify-center gap-1.5 transition-all ${
+              role === 'buyer'
+                ? 'bg-white text-indigo-700 shadow-xs font-bold'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            <ShoppingBag size={14} />
+            <span>Shopper</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setRole('seller')}
+            className={`flex-1 py-2 rounded-lg flex items-center justify-center gap-1.5 transition-all ${
+              role === 'seller'
+                ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-xs font-bold'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            <Store size={14} />
+            <span>Store Merchant</span>
+          </button>
+        </div>
+
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-5 sm:p-7">
+          <form onSubmit={handleSubmit} className="space-y-3.5">
+            {role === 'seller' && (
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">Store / Business Name (Optional)</label>
+                <div className="relative">
+                  <Store size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="text"
+                    value={storeName}
+                    onChange={(e) => setStoreName(e.target.value)}
+                    placeholder="e.g. Apex Electronics"
+                    className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-orange-500 text-xs"
+                  />
+                </div>
+              </div>
+            )}
+
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">Email Address</label>
               <div className="relative">
-                <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <Mail size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-all text-sm"
+                  placeholder={role === 'seller' ? 'merchant@store.com' : 'you@example.com'}
+                  className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-indigo-500 text-xs text-gray-800"
                   required
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">Password</label>
               <div className="relative">
-                <Lock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-xl outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-all text-sm"
+                  className="w-full pl-9 pr-9 py-2 border border-gray-200 rounded-xl outline-none focus:border-indigo-500 text-xs text-gray-800"
                   required
                 />
                 <button
@@ -75,64 +136,57 @@ const LoginPage: React.FC = () => {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
               </div>
             </div>
 
-            <div className="flex items-center justify-between">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
-                <span className="text-sm text-gray-600">Remember me</span>
+            <div className="flex items-center justify-between text-xs pt-0.5">
+              <label className="flex items-center gap-1.5 cursor-pointer">
+                <input type="checkbox" defaultChecked className="w-3.5 h-3.5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
+                <span className="text-gray-600 text-[11px]">Remember me</span>
               </label>
-              <a href="#" className="text-sm text-indigo-600 font-medium hover:underline">Forgot password?</a>
+              <a href="#" className="text-indigo-600 text-[11px] font-medium hover:underline">Forgot password?</a>
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold py-3 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
+              className={`w-full text-white font-semibold py-2.5 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 text-xs ${
+                role === 'seller'
+                  ? 'bg-gradient-to-r from-orange-500 to-red-500 hover:opacity-95'
+                  : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-95'
+              }`}
             >
               {loading ? (
-                <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
               ) : (
-                'Sign In'
+                <>
+                  <span>{role === 'seller' ? 'Access Merchant Portal' : 'Sign In'}</span>
+                  <ArrowRight size={14} />
+                </>
               )}
             </button>
           </form>
-
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-3 bg-white text-gray-500">Or continue with</span>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-3 mt-4">
-              <button
-                onClick={() => addToast('Google login is being set up. Please use email login for now.', 'info', 4000)}
-                className="flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-                title="Coming soon - Use email login"
-              >
-                <span>🔵</span> Google
-              </button>
-              <button
-                onClick={() => addToast('Facebook login is being set up. Please use email login for now.', 'info', 4000)}
-                className="flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-                title="Coming soon - Use email login"
-              >
-                <span>📘</span> Facebook
-              </button>
-            </div>
-          </div>
         </div>
 
-        <p className="text-center text-sm text-gray-500 mt-6">
-          Don't have an account?{' '}
-          <Link to="/signup" className="text-indigo-600 font-medium hover:underline">Sign up free</Link>
-        </p>
+        <div className="text-center text-xs text-gray-500 mt-3.5">
+          {role === 'seller' ? (
+            <p>
+              Want to register a new store?{' '}
+              <Link to="/store/register" className="text-orange-600 font-semibold hover:underline">
+                Register Store
+              </Link>
+            </p>
+          ) : (
+            <p>
+              Don't have an account?{' '}
+              <Link to="/signup" className="text-indigo-600 font-semibold hover:underline">
+                Sign up free
+              </Link>
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );

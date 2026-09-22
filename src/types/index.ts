@@ -99,17 +99,34 @@ export interface Deal {
   expiresAt: string;
 }
 
+export type UserRole = 'buyer' | 'seller' | 'admin';
+
 export interface User {
   id: string;
   name: string;
   email: string;
   avatar: string;
+  role?: UserRole;
+  storeId?: string;
+  storeName?: string;
+  storeDetails?: {
+    businessName: string;
+    logoUrl?: string;
+    isVerified?: boolean;
+    membershipLevel?: 'free' | 'premium' | 'enterprise';
+  };
   watchlist: string[];
   priceAlerts: PriceAlert[];
   clickHistory: ClickLog[];
   preferences: UserPreferences;
   notificationSettings: NotificationSettings;
   createdAt: string;
+  membershipTier?: 'free' | 'vip' | 'pro';
+  membershipExpiresAt?: string;
+  referralCode?: string;
+  referralBalance?: number;
+  totalReferred?: number;
+  adFreeMode?: boolean;
 }
 
 export interface PriceAlert {
@@ -167,3 +184,99 @@ export interface OutboundRedirect {
   originalUrl: string;
   redirectUrl: string;
 }
+
+export interface PricePrediction {
+  recommendation: 'BUY_NOW' | 'WAIT' | 'FAIR_PRICE';
+  confidence: number;
+  expectedPriceChangePct: number;
+  daysToWait?: number;
+  volatility: 'LOW' | 'MODERATE' | 'HIGH';
+  trend: 'FALLING' | 'STABLE' | 'RISING';
+  rationale: string;
+  targetBuyPrice?: number;
+}
+
+export interface RegionalMarket {
+  countryCode: 'NG' | 'GH' | 'KE' | 'ZA' | 'US';
+  countryName: string;
+  currencyCode: string;
+  currencySymbol: string;
+  exchangeRateToNGN: number; // 1 NGN * exchangeRateToNGN = target currency
+  flag: string;
+  cities: string[];
+}
+
+export interface CollaborativeList {
+  id: string;
+  title: string;
+  description: string;
+  creatorName: string;
+  creatorEmail: string;
+  productIds: string[];
+  createdAt: string;
+  isPublic: boolean;
+  shareCode: string;
+}
+
+export interface ReferralRecord {
+  id: string;
+  friendName: string;
+  date: string;
+  status: 'completed' | 'pending';
+  rewardAmount: number;
+}
+
+export interface AdminBankSettings {
+  bankName: string;
+  accountNumber: string;
+  accountName: string;
+  autoPayout: boolean;
+  payoutSchedule: 'instant' | 'daily' | 'weekly' | 'monthly';
+}
+
+export interface AdminFinanceWallet {
+  totalCommissionEarned: number;
+  membershipRevenue: number;
+  storeAdCreditRevenue: number;
+  availableBalance: number;
+  totalWithdrawn: number;
+  pendingPayouts: number;
+  bankSettings: AdminBankSettings;
+}
+
+export interface AffiliatePartnerConfig {
+  storeId: string;
+  storeName: string;
+  affiliateTag: string;
+  commissionRatePct: number;
+  totalClicks: number;
+  estimatedGMV: number;
+  commissionEarned: number;
+  active: boolean;
+  lastSync: string;
+}
+
+export interface PlatformPayoutTransaction {
+  id: string;
+  timestamp: string;
+  amount: number;
+  type: 'affiliate_commission' | 'membership_fee' | 'merchant_ad_credit' | 'developer_withdrawal';
+  source: string;
+  description: string;
+  status: 'completed' | 'processing' | 'pending';
+  reference: string;
+}
+
+export interface MerchantKYCRecord {
+  id: string;
+  storeName: string;
+  ownerEmail: string;
+  contactPhone: string;
+  registeredDate: string;
+  isVerified: boolean;
+  status: 'approved' | 'pending' | 'rejected';
+  productsCount: number;
+  adBudgetSpent: number;
+  cacNumber?: string;
+}
+
