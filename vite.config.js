@@ -32,6 +32,7 @@ function multiStoreScraperPlugin() {
 }
 
 export default defineConfig({
+  base: process.env.GITHUB_PAGES === "true" ? "/BuyWise/" : "/",
   plugins: [react(), tailwindcss(), multiStoreScraperPlugin()],
   server: {
     host: "0.0.0.0",
