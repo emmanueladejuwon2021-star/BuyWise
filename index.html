@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Compare prices across Jumia, Konga, Amazon, AliExpress and more. Save money on every purchase with PriceWise." />
     <meta name="theme-color" content="#4f46e5" />
-    <link rel="manifest" href="/manifest.json" />
+    <link rel="manifest" href="%BASE_URL%manifest.json" />
     <title>PriceWise - Smart Price Comparison Across Top E-Commerce Stores</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -15,7 +15,6 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
     <style>
-      /* 内联样式确保主题色立即生效，避免闪烁 */
       html,
       body {
         margin: 0;
@@ -35,7 +34,6 @@
       }
     </style>
     <script>
-      // 在 React 加载前立即设置主题，避免闪烁
       (function () {
         const isInIframe = window.self !== window.top;
 
@@ -46,7 +44,6 @@
         }
 
         if (isInIframe) {
-          // 监听父窗口主动推送的主题消息
           window.addEventListener("message", function (event) {
             if (event.data && typeof event.data.theme === "string") {
               const theme = event.data.theme;
@@ -56,7 +53,6 @@
             }
           });
         } else {
-          // 非 iframe 环境，使用默认 light 主题
           applyThemeToDOM("light");
         }
       })();
@@ -66,11 +62,10 @@
         if (window.self === window.top) return;
         var reported = {};
         window.addEventListener("error", function (event) {
-          // 资源加载失败的 error 事件没有 message，此处仅上报 JS 运行时错误
           if (!event || !event.message) return;
           var key =
             event.message + "|" + (event.filename || "") + "|" + (event.lineno || 0);
-          if (reported[key]) return; // 相同错误只上报一次，避免渲染循环刷屏
+          if (reported[key]) return;
           reported[key] = true;
           try {
             window.parent.postMessage(
@@ -89,9 +84,7 @@
               },
               "*"
             );
-          } catch (e) {
-            /* 上报失败不影响页面运行 */
-          }
+          } catch (e) {}
         });
       })();
     </script>
