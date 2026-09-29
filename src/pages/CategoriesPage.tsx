@@ -17,7 +17,7 @@ const CategoriesPage: React.FC = () => {
           {categories.map(category => (
             <Link
               key={category.id}
-              to={`/search?category=${category.id}`}
+              to={`/search?q=${encodeURIComponent(category.name)}&category=${category.id}`}
               className="bg-white rounded-2xl border border-gray-100 p-6 text-center hover:shadow-md hover:border-indigo-200 transition-all"
             >
               <span className="text-4xl mb-3 block">{category.icon}</span>

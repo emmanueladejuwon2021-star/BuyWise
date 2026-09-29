@@ -3,9 +3,10 @@ import { Link } from 'react-router-dom';
 import { Flame } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import { products, getBestDeal } from '../data/products';
+import { mongoAtlas } from '../services/mongodbAtlas';
 
 const DealsPage: React.FC = () => {
-  const deals = products
+  const deals = [...mongoAtlas.getProductsSync(), ...products]
     .map(p => ({ product: p, ...getBestDeal(p) }))
     .sort((a, b) => b.listing.discount - a.listing.discount);
 
