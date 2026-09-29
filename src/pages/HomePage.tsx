@@ -1,9 +1,11 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Shield, Clock, Search, ChevronRight, Scale, Tag, Truck, Zap } from 'lucide-react';
 import { categories, stores } from '../data/products';
 
 const HomePage: React.FC = () => {
+  const [homeQuery, setHomeQuery] = useState('');
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-gray-50">
       <section className="relative overflow-hidden bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500">
@@ -21,12 +23,30 @@ const HomePage: React.FC = () => {
               Search a product, then compare live offers from stores such as Jumia and Konga.
               Catalog numbers stay empty until a real search or a store listing comes in.
             </p>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const q = homeQuery.trim();
+                navigate(q ? `/search?q=${encodeURIComponent(q)}` : '/search');
+              }}
+              className="flex flex-col sm:flex-row gap-2 mb-4 max-w-xl"
+            >
+              <input
+                value={homeQuery}
+                onChange={(e) => setHomeQuery(e.target.value)}
+                placeholder="Try a product name"
+                className="flex-1 px-4 py-3 rounded-full text-gray-900 text-base outline-none"
+              />
+              <button type="submit" className="px-6 py-3 bg-yellow-300 text-indigo-900 font-semibold rounded-full">
+                Search
+              </button>
+            </form>
             <div className="flex flex-row items-center gap-3 flex-wrap">
               <Link
                 to="/search"
                 className="inline-flex items-center justify-center gap-2 bg-white text-indigo-600 font-semibold px-6 py-3 text-sm sm:text-base rounded-full hover:bg-gray-100 transition-colors shadow-sm"
               >
-                Start a search <ArrowRight size={18} />
+                Open search page <ArrowRight size={18} />
               </Link>
               <Link
                 to="/store/register"
@@ -36,7 +56,6 @@ const HomePage: React.FC = () => {
               </Link>
             </div>
           </div>
-
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-10">
             {[
               { label: 'Products listed', value: 'None yet', icon: Search, note: 'Filled after a live search' },
@@ -53,7 +72,6 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </section>
-
       <section className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Link to="/compare" className="flex items-center gap-4 p-5 bg-white rounded-2xl border border-gray-200 hover:border-indigo-400 hover:shadow-sm transition-all">
@@ -94,7 +112,6 @@ const HomePage: React.FC = () => {
           </Link>
         </div>
       </section>
-
       <section className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Shop by category</h2>
@@ -106,7 +123,7 @@ const HomePage: React.FC = () => {
           {categories.map(cat => (
             <Link
               key={cat.id}
-              to={`/search?category=${cat.id}`}
+              to={`/search?q=${encodeURIComponent(cat.name)}&category=${cat.id}`}
               className="bg-white rounded-2xl p-5 text-center hover:shadow-md hover:border-indigo-200 border border-gray-100 transition-all"
             >
               <span className="text-3xl mb-3 block">{cat.icon}</span>
@@ -116,14 +133,13 @@ const HomePage: React.FC = () => {
           ))}
         </div>
       </section>
-
       <section className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">Stores we can search</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           {stores.map(store => (
             <Link
               key={store.id}
-              to={`/search?store=${store.id}`}
+              to={`/search?q=${encodeURIComponent(store.name)}&store=${store.id}`}
               className="bg-white rounded-2xl p-5 border border-gray-100 hover:shadow-sm hover:border-indigo-200 transition-all flex items-center gap-4"
             >
               <span className="text-3xl shrink-0">{store.logo}</span>
@@ -135,7 +151,6 @@ const HomePage: React.FC = () => {
           ))}
         </div>
       </section>
-
       <section className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Hot deals</h2>
         <p className="text-base text-gray-500 mb-6">Deals appear here after products are listed or found in search.</p>
@@ -149,7 +164,6 @@ const HomePage: React.FC = () => {
           </Link>
         </div>
       </section>
-
       <section className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         <div className="text-center mb-8">
           <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">How it works</h2>
@@ -169,7 +183,6 @@ const HomePage: React.FC = () => {
           ))}
         </div>
       </section>
-
       <section className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Popular products</h2>
         <p className="text-base text-gray-500 mb-6">This list is empty on purpose. Sample iPhones and laptops were removed.</p>
@@ -178,7 +191,6 @@ const HomePage: React.FC = () => {
           <p className="text-base text-gray-500 mt-2">Use search, or register a store and add a real item.</p>
         </div>
       </section>
-
       <section className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
         <div className="bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-600 rounded-3xl p-8 sm:p-10">
           <p className="text-sm text-white/80 font-medium mb-3">For store owners</p>
@@ -186,25 +198,18 @@ const HomePage: React.FC = () => {
           <p className="text-white/85 mb-6 text-base max-w-2xl leading-relaxed">
             There is no paid traffic yet. Register if you want a profile ready for later. Do not expect shopper volume today.
           </p>
-          <Link
-            to="/store/register"
-            className="inline-flex items-center gap-2 bg-white text-indigo-600 font-semibold px-6 py-3 text-base rounded-full hover:bg-gray-100 transition-colors"
-          >
+          <Link to="/store/register" className="inline-flex items-center gap-2 bg-white text-indigo-600 font-semibold px-6 py-3 text-base rounded-full hover:bg-gray-100 transition-colors">
             Register your store <ArrowRight size={18} />
           </Link>
         </div>
       </section>
-
       <section className="max-w-7xl mx-auto px-4 sm:px-6 py-10 pb-16">
         <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-3xl p-8 sm:p-12 text-center">
           <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">Create a free account</h2>
           <p className="text-white/85 mb-6 text-base max-w-lg mx-auto leading-relaxed">
             Watchlists and alerts need a sign-in. We do not claim a large user base.
           </p>
-          <Link
-            to="/signup"
-            className="inline-flex items-center gap-2 bg-white text-indigo-600 font-semibold px-6 py-3 text-base rounded-full hover:bg-gray-100 transition-colors"
-          >
+          <Link to="/signup" className="inline-flex items-center gap-2 bg-white text-indigo-600 font-semibold px-6 py-3 text-base rounded-full hover:bg-gray-100 transition-colors">
             Sign up <ArrowRight size={18} />
           </Link>
         </div>
