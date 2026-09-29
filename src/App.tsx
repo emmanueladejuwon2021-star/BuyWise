@@ -34,6 +34,8 @@ import ComparePage from './pages/ComparePage';
 import CouponsPage from './pages/CouponsPage';
 import ShippingCalculatorPage from './pages/ShippingCalculatorPage';
 
+const routerBasename = (import.meta.env.BASE_URL || '/').replace(/\/$/, '') || '/';
+
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
   const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
@@ -62,7 +64,7 @@ const App: React.FC = () => {
     <ToastProvider>
       <AuthProvider>
         <RegionProvider>
-          <Router>
+          <Router basename={routerBasename}>
             <Layout>
               <Routes>
                 {/* Shopper / Consumer Marketplace Routes */}
